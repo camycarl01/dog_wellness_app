@@ -22,7 +22,7 @@ joblib==1.4.2
 xgboost==2.1.1
 
 # PDF generation (Day 24 — health certificates)
-reportlab==4.2.3
+reportlab>=4.2.4
 
 # Email (Day 21 — reminders)
 sendgrid==6.11.0
