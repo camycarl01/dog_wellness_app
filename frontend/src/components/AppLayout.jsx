@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { signOut } from '../lib/supabase'
+import { DogProvider, useDogs } from '../context/DogContext'
 import {
   LayoutDashboard, HeartPulse, Utensils, Stethoscope,
   TrendingUp, Dog, Camera, BookOpen, FlaskConical,
@@ -65,7 +66,42 @@ function NavGroup({ label, items }) {
   )
 }
 
-export default function AppLayout() {
+function DogSwitcher() {
+  const { dogs, activeDogId, setActiveDogId, loading } = useDogs()
+
+  if (loading) {
+    return <div className="px-3 mb-4 text-xs text-gray-400">Loading dogs…</div>
+  }
+  if (!dogs.length) {
+    return (
+      <div className="px-3 mb-4">
+        <NavLink to="/dogs/new" className="text-xs text-teal-600 hover:underline">
+          + Add your first dog
+        </NavLink>
+      </div>
+    )
+  }
+
+  return (
+    <div className="px-3 mb-4">
+      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active dog</label>
+      <div className="relative mt-1">
+        <select
+          value={activeDogId ?? ''}
+          onChange={(e) => setActiveDogId(e.target.value)}
+          className="w-full appearance-none rounded-lg border border-gray-200 bg-white px-3 py-2 pr-8 text-sm text-gray-800 focus:border-teal-500 focus:outline-none"
+        >
+          {dogs.map((d) => (
+            <option key={d.id} value={d.id}>{d.name}</option>
+          ))}
+        </select>
+        <ChevronDown size={15} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+      </div>
+    </div>
+  )
+}
+
+function AppLayoutInner() {
   const { displayName, isBreeder } = useAuth()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -91,6 +127,9 @@ export default function AppLayout() {
         </div>
         <span className="font-semibold text-gray-900 text-base">PawCare</span>
       </div>
+
+      {/* Dog switcher */}
+      <DogSwitcher />
 
       {/* Nav groups */}
       <nav className="flex-1 overflow-y-auto">
@@ -165,5 +204,13 @@ export default function AppLayout() {
         </main>
       </div>
     </div>
+  )
+}
+
+export default function AppLayout() {
+  return (
+    <DogProvider>
+      <AppLayoutInner />
+    </DogProvider>
   )
 }
