@@ -8,6 +8,8 @@ import DashboardPage from './pages/DashboardPage'
 import ComingSoon from './components/ComingSoon'
 import AddDog from './pages/AddDog'
 import DogProfile from './pages/DogProfile'  // we'll build this next
+import VetPage from './pages/VetPage'
+import VaccinesPage from './pages/VaccinesPage'
 
 
 function PlaceholderPage({ title, day }) {
@@ -47,8 +49,8 @@ export default function App() {
             <Route path="/nutrition/toxic-foods" element={<PlaceholderPage title="Toxic foods database" day={20} />} />
 
             {/* Vet */}
-            <Route path="/vet" element={<PlaceholderPage title="Vet visits" day={7} />} />
-            <Route path="/vet/vaccines" element={<PlaceholderPage title="Vaccine tracker" day={7} />} />
+            <Route path="/vet" element={<VetPage />} />
+            <Route path="/vet/vaccines" element={<VaccinesPage />} />
 
             {/* Tracking */}
             <Route path="/tracking/weight" element={<PlaceholderPage title="Weight & growth chart" day={12} />} />
