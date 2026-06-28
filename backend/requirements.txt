@@ -1,0 +1,31 @@
+# PawCare Backend — Python dependencies
+# Install with: pip install -r requirements.txt
+
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# Supabase
+supabase==2.7.4
+
+# Data validation
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+# File handling (photo uploads)
+python-multipart==0.0.9
+Pillow==10.4.0
+
+# ML (install when you reach Day 9+)
+scikit-learn==1.5.2
+joblib==1.4.2
+xgboost==2.1.1
+
+# PDF generation (Day 24 — health certificates)
+reportlab==4.2.3
+
+# Email (Day 21 — reminders)
+sendgrid==6.11.0
+
+# Dev tools
+httpx==0.27.2   # for testing FastAPI endpoints
