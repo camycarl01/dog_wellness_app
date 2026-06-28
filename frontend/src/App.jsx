@@ -6,6 +6,9 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
 import ComingSoon from './components/ComingSoon'
+import AddDog from './pages/AddDog'
+import DogProfile from './pages/DogProfile'  // we'll build this next
+
 
 function PlaceholderPage({ title, day }) {
   return <ComingSoon title={title} day={day} />
@@ -30,8 +33,8 @@ export default function App() {
             }
           >
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/dogs/new" element={<PlaceholderPage title="Add dog profile" day={5} />} />
-            <Route path="/dogs/:id" element={<PlaceholderPage title="Dog profile" day={5} />} />
+            <Route path="/dogs/new" element={<AddDog />} />
+            <Route path="/dogs/:id" element={<DogProfile />} />
 
             {/* Health */}
             <Route path="/health" element={<PlaceholderPage title="Symptom checker" day={8} />} />
