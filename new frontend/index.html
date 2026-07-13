@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" class="bg-background">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0f0e" />
+    <meta name="description" content="PawCare — the premium wellness companion for your dog. Track health, vaccines, vet visits, and more." />
+    <title>PawCare — Dog Wellness Platform</title>
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <script>
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('pawcare-theme')
+          var dark =
+            stored === 'dark' ||
+            (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) document.documentElement.classList.add('dark')
+        } catch (e) {}
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

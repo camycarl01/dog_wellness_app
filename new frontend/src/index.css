@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light, warm wellness theme — soft off-white with deep teal accent */
+    --background: 80 20% 97%;
+    --foreground: 165 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 165 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 165 25% 12%;
+    --primary: 170 70% 30%;
+    --primary-foreground: 80 20% 98%;
+    --secondary: 100 12% 92%;
+    --secondary-foreground: 165 25% 12%;
+    --muted: 100 12% 92%;
+    --muted-foreground: 160 8% 42%;
+    --accent: 170 70% 30%;
+    --accent-foreground: 80 20% 98%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 120 8% 86%;
+    --input: 120 8% 86%;
+    --ring: 170 70% 30%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark, premium theme — deep charcoal-green with teal accent */
+    --background: 160 12% 5%;
+    --foreground: 150 12% 92%;
+    --card: 160 10% 8%;
+    --card-foreground: 150 12% 92%;
+    --popover: 160 10% 8%;
+    --popover-foreground: 150 12% 92%;
+    --primary: 172 66% 50%;
+    --primary-foreground: 165 60% 8%;
+    --secondary: 160 8% 12%;
+    --secondary-foreground: 150 12% 92%;
+    --muted: 160 8% 12%;
+    --muted-foreground: 150 7% 58%;
+    --accent: 172 66% 50%;
+    --accent-foreground: 165 60% 8%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 160 8% 15%;
+    --input: 160 8% 15%;
+    --ring: 172 66% 50%;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply bg-background;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.35);
+  }
+}
+
+@layer components {
+  /* Frosted panel used across the app */
+  .panel {
+    @apply rounded-2xl border border-border bg-card/80 backdrop-blur-sm;
+  }
+
+  /* Form field */
+  .field {
+    @apply h-11 w-full rounded-lg border border-border bg-secondary/60 px-3.5 text-sm text-foreground
+      placeholder:text-muted-foreground/60 transition-colors duration-200
+      focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/20;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground;
+  }
+
+  .field-error {
+    @apply mt-1.5 text-xs text-destructive;
+  }
+
+  /* Primary action button */
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full
+      bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground
+      transition-shadow duration-300 ease-out
+      hover:shadow-[0_0_32px_-6px_hsl(var(--accent)/0.55)]
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Ghost / secondary button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-border
+      bg-transparent px-5 py-2.5 text-sm font-medium text-foreground
+      transition-colors duration-200 hover:border-accent/50 hover:text-accent
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Sidebar nav link */
+  .nav-link {
+    @apply relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium
+      text-muted-foreground transition-colors duration-200;
+  }
+
+  .nav-link:hover {
+    @apply bg-secondary text-foreground;
+  }
+
+  .nav-link.active {
+    @apply bg-accent/10 text-accent;
+  }
+}
+
+/* Halo that separates accent text from busy backgrounds (theme-aware) */
+.text-halo {
+  text-shadow:
+    0 0 10px hsl(var(--background)),
+    0 0 24px hsl(var(--background)),
+    0 2px 44px hsl(var(--background));
+}
+
+/* Lenis smooth scroll (required CSS from awwwards-animations skill) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { signIn } from '../lib/supabase'
+import { isSupabaseConfigured, signIn } from '../lib/supabase'
 import { Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 const schema = z.object({
@@ -23,6 +23,9 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     setAuthError('')
+    if (!isSupabaseConfigured) {
+      return
+    }
     setLoading(true)
     try {
       await signIn(values.email, values.password)
@@ -50,6 +53,15 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">Sign in</h2>
           <p className="text-sm text-gray-500 mb-6">Welcome back. Let's check on your dog.</p>
+
+          {!isSupabaseConfigured && (
+            <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-100 text-amber-800 rounded-lg px-3.5 py-3 mb-5 text-sm">
+              <AlertCircle size={16} className="shrink-0 mt-0.5" />
+              <span>
+                Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in frontend/.env, then reload to enable sign in.
+              </span>
+            </div>
+          )}
 
           {authError && (
             <div className="flex items-start gap-2.5 bg-red-50 border border-red-100 text-red-700 rounded-lg px-3.5 py-3 mb-5 text-sm">
@@ -106,7 +118,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !isSupabaseConfigured}
               className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
             >
               {loading ? (

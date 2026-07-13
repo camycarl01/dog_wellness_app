@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { signUp } from '../lib/supabase'
+import { getAuthErrorMessage, isSupabaseConfigured, signUp } from '../lib/supabase'
 import { Eye, EyeOff, AlertCircle, Check } from 'lucide-react'
 
 const schema = z.object({
@@ -48,12 +48,15 @@ export default function SignupPage() {
 
   const onSubmit = async (values) => {
     setAuthError('')
+    if (!isSupabaseConfigured) {
+      return
+    }
     setLoading(true)
     try {
       await signUp(values.email, values.password, values.name, values.isBreeder)
       setSuccess(true)
     } catch (err) {
-      setAuthError(err.message || 'Something went wrong. Try again.')
+      setAuthError(getAuthErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -93,6 +96,15 @@ export default function SignupPage() {
         <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">Create your account</h2>
           <p className="text-sm text-gray-500 mb-6">Free forever. No credit card needed.</p>
+
+          {!isSupabaseConfigured && (
+            <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-100 text-amber-800 rounded-lg px-3.5 py-3 mb-5 text-sm">
+              <AlertCircle size={16} className="shrink-0 mt-0.5" />
+              <span>
+                Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in frontend/.env, then reload to enable account creation.
+              </span>
+            </div>
+          )}
 
           {authError && (
             <div className="flex items-start gap-2.5 bg-red-50 border border-red-100 text-red-700 rounded-lg px-3.5 py-3 mb-5 text-sm">
@@ -184,7 +196,7 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !isSupabaseConfigured}
               className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
             >
               {loading ? (
