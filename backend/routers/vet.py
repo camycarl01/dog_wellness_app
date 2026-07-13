@@ -8,6 +8,21 @@ import uuid
 router = APIRouter()
 
 
+# ----- Shared helper -----
+
+async def _verify_dog_ownership(dog_id: str, user_id: str, supabase):
+    res = (
+        supabase.table("dogs")
+        .select("id")
+        .eq("id", dog_id)
+        .eq("user_id", user_id)
+        .single()
+        .execute()
+    )
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Dog not found")
+
+
 # ----- Vet visits -----
 
 @router.post("/vet-visits", status_code=status.HTTP_201_CREATED)
@@ -16,6 +31,7 @@ async def create_vet_visit(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
+    await _verify_dog_ownership(body.dog_id, user.id, supabase)
     data = {"id": str(uuid.uuid4()), **body.model_dump(mode="json")}
     res = supabase.table("vet_visits").insert(data).execute()
     if not res.data:
@@ -29,6 +45,7 @@ async def list_vet_visits(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
+    await _verify_dog_ownership(dog_id, user.id, supabase)
     res = (
         supabase.table("vet_visits")
         .select("*")
@@ -56,6 +73,7 @@ async def create_vaccine(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
+    await _verify_dog_ownership(body.dog_id, user.id, supabase)
     data = {
         "id": str(uuid.uuid4()),
         **body.model_dump(mode="json"),
@@ -73,6 +91,7 @@ async def list_vaccines(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
+    await _verify_dog_ownership(dog_id, user.id, supabase)
     res = (
         supabase.table("vaccines")
         .select("*")
