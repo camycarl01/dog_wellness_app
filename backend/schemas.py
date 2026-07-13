@@ -74,7 +74,8 @@ class SymptomLogCreate(BaseModel):
     dog_id: UUID
     symptoms: Dict[str, bool]   # {"lethargy": True, "vomiting": False, ...}
     duration_days: int = 1
-
+    temperature: Optional[float] = None
+    
 class SymptomLogResponse(SymptomLogCreate):
     id: UUID
     logged_at: datetime

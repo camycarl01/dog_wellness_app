@@ -1,125 +1,124 @@
-"""
-Symptom checker router.
-Day 8: rule-based placeholder predictor.
-Day 10: swap in the Random Forest .pkl model.
-"""
 from fastapi import APIRouter, Depends, HTTPException, status
 from auth import get_current_user, get_supabase
-from schemas import SymptomLogCreate, IllnessPrediction, Severity
+from schemas import SymptomLogCreate, Severity
+from datetime import datetime, timedelta
+import random
 import uuid
 
 router = APIRouter()
 
-# ---------------------------------------------------------------
-# RULE-BASED PLACEHOLDER — replace with ML model on Day 10
-# ---------------------------------------------------------------
-SYMPTOM_RULES = [
-    {
-        "illness": "Parvovirus",
-        "required": {"vomiting", "diarrhea", "lethargy"},
-        "severity": Severity.emergency,
-        "recommendation": "Seek emergency veterinary care immediately. Parvovirus is life-threatening.",
-    },
-    {
-        "illness": "Kennel cough",
-        "required": {"coughing", "sneezing"},
-        "severity": Severity.mild,
-        "recommendation": "Rest, keep away from other dogs. See a vet if cough persists beyond 7 days.",
-    },
-    {
-        "illness": "Ear infection",
-        "required": {"scratching"},
-        "severity": Severity.mild,
-        "recommendation": "Schedule a vet visit within a few days for ear examination and cleaning.",
-    },
-    {
-        "illness": "Gastroenteritis",
-        "required": {"vomiting", "diarrhea"},
-        "severity": Severity.moderate,
-        "recommendation": "Withhold food for 12 hours, ensure hydration. See vet if symptoms persist.",
-    },
-    {
-        "illness": "Respiratory infection",
-        "required": {"coughing", "nasal_discharge"},
-        "severity": Severity.moderate,
-        "recommendation": "Book a vet visit within 48 hours.",
-    },
-    {
-        "illness": "Lethargy / malaise",
-        "required": {"lethargy", "loss_of_appetite"},
-        "severity": Severity.moderate,
-        "recommendation": "Monitor closely. See a vet if symptoms persist beyond 48 hours.",
-    },
+# ----- Rule-based placeholder "model" (Day 8-9, real ML comes Day 9-10) -----
+
+ILLNESS_PROFILES = [
+    {"illness": "Parvovirus", "symptoms": {"vomiting", "diarrhea", "lethargy", "loss_of_appetite"}, "severity": Severity.emergency,
+     "recommendation": "Highly contagious and dangerous, especially in puppies. See a vet immediately."},
+    {"illness": "Gastroenteritis", "symptoms": {"vomiting", "diarrhea"}, "severity": Severity.moderate,
+     "recommendation": "Monitor hydration closely. See a vet if symptoms persist beyond 24 hours."},
+    {"illness": "Kennel cough", "symptoms": {"coughing", "sneezing", "nasal_discharge"}, "severity": Severity.mild,
+     "recommendation": "Usually mild and self-limiting. Keep away from other dogs and monitor."},
+    {"illness": "Hip dysplasia", "symptoms": {"limping", "lethargy"}, "severity": Severity.moderate,
+     "recommendation": "Schedule a vet visit for a joint evaluation, especially if limping persists."},
+    {"illness": "Ear infection", "symptoms": {"scratching", "swelling"}, "severity": Severity.mild,
+     "recommendation": "Check the ears for odor or discharge. A vet visit can confirm and treat quickly."},
+    {"illness": "Conjunctivitis", "symptoms": {"eye_discharge", "swelling"}, "severity": Severity.mild,
+     "recommendation": "Keep the eye area clean. See a vet if discharge worsens or vision seems affected."},
+    {"illness": "Allergic reaction", "symptoms": {"swelling", "scratching", "eye_discharge"}, "severity": Severity.moderate,
+     "recommendation": "Watch for facial swelling or difficulty breathing — those need emergency care."},
+    {"illness": "Seizure disorder", "symptoms": {"seizure", "lethargy"}, "severity": Severity.emergency,
+     "recommendation": "Any seizure warrants a vet call. Note the duration and what happened before/after."},
 ]
 
+FALLBACK = {
+    "illness": "Unable to determine",
+    "severity": Severity.mild,
+    "recommendation": "Not enough matching symptoms to suggest a likely cause. Monitor your dog and check again if symptoms develop.",
+}
 
-def rule_based_predict(symptoms: dict, duration_days: int) -> IllnessPrediction:
-    active = {k for k, v in symptoms.items() if v}
-    best_match = None
-    best_overlap = 0
 
-    for rule in SYMPTOM_RULES:
-        overlap = len(rule["required"] & active)
-        if overlap > best_overlap:
-            best_overlap = overlap
-            best_match = rule
+def _predict(symptoms: dict, duration_days: int, temperature: float | None):
+    selected = {k for k, v in symptoms.items() if v}
 
-    if not best_match or best_overlap == 0:
-        return IllnessPrediction(
-            illness="No specific illness identified",
-            confidence=0.3,
-            severity=Severity.mild,
-            recommendation="Monitor your dog's condition. Consult a vet if symptoms worsen or persist.",
-        )
+    if not selected:
+        return FALLBACK["illness"], 0.0, FALLBACK["severity"], FALLBACK["recommendation"]
 
-    # Escalate severity if symptoms have lasted a long time
-    severity = best_match["severity"]
-    if duration_days >= 3 and severity == Severity.mild:
+    scored = []
+    for profile in ILLNESS_PROFILES:
+        overlap = selected & profile["symptoms"]
+        if not overlap:
+            continue
+        score = len(overlap) / len(profile["symptoms"])
+        scored.append((score, profile))
+
+    if not scored:
+        return FALLBACK["illness"], 0.0, FALLBACK["severity"], FALLBACK["recommendation"]
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    best_score, best = scored[0]
+
+    # jitter so repeated identical inputs don't always look robotic
+    confidence = min(0.95, max(0.35, best_score + random.uniform(-0.05, 0.1)))
+
+    severity = best["severity"]
+    # bump severity if symptoms have lasted a while or fever is high
+    if duration_days >= 7 and severity == Severity.mild:
         severity = Severity.moderate
+    if temperature is not None and temperature >= 39.5 and severity in (Severity.mild, Severity.moderate):
+        severity = Severity.severe
 
-    confidence = min(0.95, best_overlap / len(best_match["required"]) * 0.85)
+    return best["illness"], round(confidence, 2), severity, best["recommendation"]
 
-    return IllnessPrediction(
-        illness=best_match["illness"],
-        confidence=round(confidence, 2),
-        severity=severity,
-        recommendation=best_match["recommendation"],
+
+async def _verify_dog_ownership(dog_id: str, user_id: str, supabase):
+    res = (
+        supabase.table("dogs")
+        .select("id")
+        .eq("id", dog_id)
+        .eq("user_id", user_id)
+        .single()
+        .execute()
     )
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Dog not found")
 
 
-# ---------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------
+# ----- Routes -----
 
-@router.post("/predict/illness", response_model=IllnessPrediction)
-async def predict_illness(
+@router.post("/predict/illness", status_code=status.HTTP_201_CREATED)
+async def create_symptom_log(
     body: SymptomLogCreate,
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
-    prediction = rule_based_predict(body.symptoms, body.duration_days)
+    await _verify_dog_ownership(str(body.dog_id), user.id, supabase)
 
-    # Save the log
-    log_data = {
+    illness, confidence, severity, recommendation = _predict(
+        body.symptoms, body.duration_days, body.temperature
+    )
+
+    data = {
         "id": str(uuid.uuid4()),
-        "dog_id": str(body.dog_id),
-        "symptoms": body.symptoms,
-        "duration_days": body.duration_days,
-        "prediction": prediction.illness,
-        "severity": prediction.severity.value,
-        "confidence": prediction.confidence,
+        **body.model_dump(mode="json"),
+        "logged_at": datetime.utcnow().isoformat(),
+        "prediction": illness,
+        "severity": severity.value,
+        "confidence": confidence,
     }
-    supabase.table("symptom_logs").insert(log_data).execute()
+    res = supabase.table("symptom_logs").insert(data).execute()
+    if not res.data:
+        raise HTTPException(status_code=500, detail="Failed to save symptom check")
 
-    return prediction
+    saved = res.data[0]
+    saved["recommendation"] = recommendation  # not persisted, just returned for the result page
+    return saved
 
 
-@router.get("/symptoms/{dog_id}")
+@router.get("/predict/illness/{dog_id}")
 async def list_symptom_logs(
     dog_id: str,
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
+    await _verify_dog_ownership(dog_id, user.id, supabase)
     res = (
         supabase.table("symptom_logs")
         .select("*")
