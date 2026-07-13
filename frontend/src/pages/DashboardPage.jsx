@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useDogs } from '../context/DogContext'
+import { ageFromDob } from '../lib/utils'
 import {
   HeartPulse, Utensils, Syringe, Weight, PawPrint,
-  Plus, Activity, Calendar
+  Plus, Activity, Calendar, Loader2
 } from 'lucide-react'
 
 const quickActions = [
@@ -17,10 +19,12 @@ const quickActions = [
 export default function DashboardPage() {
   const { displayName } = useAuth()
   const firstName = displayName.split(' ')[0]
+  const { dogs, activeDogId, loading } = useDogs()
+
+  const activeDog = dogs.find((d) => d.id === activeDogId) || null
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Greeting */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">
           Good morning, {firstName} 👋
@@ -28,22 +32,71 @@ export default function DashboardPage() {
         <p className="text-gray-500 text-sm mt-1">Let's take care of your dog today.</p>
       </div>
 
-      {/* No dog yet — prompt to add one */}
-      <div className="card border-dashed border-gray-200 text-center py-14 mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-50 rounded-2xl mb-4">
-          <PawPrint size={28} className="text-teal-600" />
+      {loading ? (
+        <div className="flex justify-center py-14">
+          <Loader2 className="animate-spin text-gray-400" size={24} />
         </div>
-        <h2 className="text-base font-semibold text-gray-800 mb-1">Add your first dog</h2>
-        <p className="text-sm text-gray-500 mb-5 max-w-xs mx-auto">
-          Create a profile to start tracking health, meals, vaccines, and more.
-        </p>
-        <Link to="/dogs/new" className="btn-primary inline-flex items-center gap-2">
-          <Plus size={16} />
-          Add a dog
-        </Link>
-      </div>
+      ) : dogs.length === 0 ? (
+        <div className="card border-dashed border-gray-200 text-center py-14 mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-50 rounded-2xl mb-4">
+            <PawPrint size={28} className="text-teal-600" />
+          </div>
+          <h2 className="text-base font-semibold text-gray-800 mb-1">Add your first dog</h2>
+          <p className="text-sm text-gray-500 mb-5 max-w-xs mx-auto">
+            Create a profile to start tracking health, meals, vaccines, and more.
+          </p>
+          <Link to="/dogs/new" className="btn-primary inline-flex items-center gap-2">
+            <Plus size={16} />
+            Add a dog
+          </Link>
+        </div>
+      ) : activeDog ? (
+        <>
+          <Link
+            to={`/dogs/${activeDog.id}`}
+            className="card flex items-center gap-4 mb-3 hover:shadow-sm transition-all"
+          >
+            <div className="w-14 h-14 rounded-xl bg-teal-50 flex items-center justify-center overflow-hidden shrink-0">
+              {activeDog.photo_url ? (
+                <img src={activeDog.photo_url} alt={activeDog.name} className="w-full h-full object-cover" />
+              ) : (
+                <PawPrint size={24} className="text-teal-600" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-semibold text-gray-900 truncate">{activeDog.name}</h3>
+              <p className="text-sm text-gray-500 truncate">
+                {activeDog.breed} · {ageFromDob(activeDog.dob)}
+              </p>
+            </div>
+          </Link>
 
-      {/* Quick actions */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+            <div className="card py-4">
+              <div className="flex items-center gap-2 mb-1">
+                <HeartPulse size={16} className="text-gray-400" />
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Health status</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-800">Not checked yet</p>
+            </div>
+            <div className="card py-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Utensils size={16} className="text-gray-400" />
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Today's feeding</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-800">Not set yet</p>
+            </div>
+            <div className="card py-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Calendar size={16} className="text-gray-400" />
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Next vet visit</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-800">Not set yet</p>
+            </div>
+          </div>
+        </>
+      ) : null}
+
       <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Quick actions</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {quickActions.map(({ icon: Icon, label, to, color }) => (

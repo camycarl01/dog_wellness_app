@@ -7,7 +7,7 @@ import uuid
 router = APIRouter()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_dog(
     body: DogCreate,
     user=Depends(get_current_user),
@@ -24,7 +24,7 @@ async def create_dog(
     return res.data[0]
 
 
-@router.get("/", response_model=List[dict])
+@router.get("", response_model=List[dict])
 async def list_dogs(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
