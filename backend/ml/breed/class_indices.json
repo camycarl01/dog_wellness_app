@@ -1,0 +1,12 @@
+{
+  "beagle": 0,
+  "chihuahua": 1,
+  "doberman": 2,
+  "german_shepherd": 3,
+  "golden_retriever": 4,
+  "labrador_retriever": 5,
+  "poodle": 6,
+  "pug": 7,
+  "rottweiler": 8,
+  "siberian_husky": 9
+}
