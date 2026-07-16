@@ -13,6 +13,9 @@ import AddDog from './pages/AddDog'
 import DogProfile from './pages/DogProfile'
 import VetPage from './pages/VetPage'
 import VaccinesPage from './pages/VaccinesPage'
+import HealthPage from './pages/HealthPage'
+import HealthResultPage from './pages/HealthResultPage'
+import HealthHistoryPage from './pages/HealthHistoryPage'
 
 
 function PlaceholderPage({ title, day }) {
@@ -44,9 +47,9 @@ export default function App() {
             <Route path="/dogs/:id" element={<DogProfile />} />
 
             {/* Health */}
-            <Route path="/health" element={<PlaceholderPage title="Symptom checker" day={8} />} />
-            <Route path="/health/result" element={<PlaceholderPage title="Symptom result" day={8} />} />
-            <Route path="/health/history" element={<PlaceholderPage title="Symptom history" day={8} />} />
+            <Route path="/health" element={<HealthPage />} />
+            <Route path="/health/result" element={<HealthResultPage />} />
+            <Route path="/health/history" element={<HealthHistoryPage />} />
 
             {/* Nutrition */}
             <Route path="/nutrition" element={<PlaceholderPage title="Feeding plan" day={11} />} />

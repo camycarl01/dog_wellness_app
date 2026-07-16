@@ -169,7 +169,34 @@ class MoodLogCreate(BaseModel):
         if not 1 <= v <= 5:
             raise ValueError("mood_score must be between 1 and 5")
         return v
+class EnergyLevel(str, Enum):
+    low = "low"
+    normal = "normal"
+    high = "high"
 
+
+class ActivityLogCreate(BaseModel):
+    dog_id: UUID
+    walk_minutes: int = 0
+    play_minutes: int = 0
+    energy_level: EnergyLevel
+    notes: Optional[str] = None
+    logged_at: Optional[datetime] = None
+
+    @field_validator("walk_minutes", "play_minutes")
+    @classmethod
+    def non_negative(cls, v):
+        if v < 0:
+            raise ValueError("duration cannot be negative")
+        return v
+
+
+class ActivityLogResponse(ActivityLogCreate):
+    id: UUID
+    logged_at: datetime
+
+    class Config:
+        from_attributes = True
 
 # ----- Heat cycle -----
 

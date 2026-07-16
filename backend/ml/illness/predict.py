@@ -16,18 +16,22 @@ This is the function Day 10's FastAPI endpoint (POST /api/predict/illness)
 should call directly.
 """
 
+from pathlib import Path
+
 import joblib
 import pandas as pd
-from illness_reference import (
+from .illness_reference import (
     SYMPTOM_LIST,
     ILLNESS_TO_SEVERITY,
     SEVERITY_RANK,
     ILLNESS_CONFIDENCE_THRESHOLD,
 )
 
-_illness_model = joblib.load("illness_model.pkl")
-_severity_model = joblib.load("severity_model.pkl")
-_feature_cols = joblib.load("feature_columns.pkl")
+_MODEL_DIR = Path(__file__).resolve().parent
+
+_illness_model = joblib.load(_MODEL_DIR / "illness_model.pkl")
+_severity_model = joblib.load(_MODEL_DIR / "severity_model.pkl")
+_feature_cols = joblib.load(_MODEL_DIR / "feature_columns.pkl")
 
 
 def predict(symptoms: dict, age_months: int, duration_days: int) -> dict:

@@ -1,113 +1,136 @@
-"""
-Nutrition router.
-Feeding recommendation uses rule-based calculator now;
-XGBoost model plugs in on Day 17.
-"""
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from auth import get_current_user, get_supabase
-from schemas import FeedingLogCreate, FeedingRecommendation, WeightLogCreate
-from datetime import datetime
+from schemas import FeedingLogCreate, FeedingRecommendation
+from datetime import date
 import uuid
 
 router = APIRouter()
 
-# ---------------------------------------------------------------
-# Rule-based feeding calculator (AKC breed standards)
-# ---------------------------------------------------------------
-def compute_feeding(weight_kg: float, age_months: int, activity: str = "moderate") -> FeedingRecommendation:
-    """
-    Returns daily kcal and grams recommendation.
-    activity: 'low' | 'moderate' | 'high'
-    """
-    # Base kcal per kg by weight class
-    if weight_kg < 5:
-        base_kcal_per_kg = 110  # Toy breeds
-    elif weight_kg < 10:
-        base_kcal_per_kg = 85   # Small breeds
-    elif weight_kg < 25:
-        base_kcal_per_kg = 70   # Medium breeds
-    elif weight_kg < 45:
-        base_kcal_per_kg = 60   # Large breeds
-    else:
-        base_kcal_per_kg = 50   # Giant breeds
 
-    # Age multipliers
+def _age_in_months(dob) -> int:
+    if isinstance(dob, str):
+        dob = date.fromisoformat(dob)
+    today = date.today()
+    months = (today.year - dob.year) * 12 + (today.month - dob.month)
+    if today.day < dob.day:
+        months -= 1
+    return max(0, months)
+
+
+def _activity_factor(age_months: int, is_neutered: bool) -> tuple[float, str]:
+    """
+    Returns (multiplier, human-readable reason) using standard veterinary
+    MER (Maintenance Energy Requirement) multipliers applied to RER.
+
+    Based on age + neuter status only, since that's what the dogs table
+    actually stores today. If an explicit activity_level field gets added
+    later (blueprint mentions this for the ML feeding model on Day 17),
+    this should take that into account too instead of just age/neuter.
+    """
     if age_months < 4:
-        age_multiplier = 2.0    # Puppies under 4 months
-    elif age_months < 12:
-        age_multiplier = 1.5    # Growing puppies
-    elif age_months > 84:       # 7+ years = senior
-        age_multiplier = 0.85
-    else:
-        age_multiplier = 1.0
-
-    # Activity multipliers
-    activity_multiplier = {"low": 0.8, "moderate": 1.0, "high": 1.2}.get(activity, 1.0)
-
-    kcal_per_day = weight_kg * base_kcal_per_kg * age_multiplier * activity_multiplier
-
-    # Average dry kibble: ~350 kcal per 100g
-    grams_per_day = (kcal_per_day / 350) * 100
-
-    # Meals per day by age
-    meals_per_day = 3 if age_months < 6 else 2
-
-    notes_parts = []
+        return 3.0, "puppy under 4 months (rapid growth)"
     if age_months < 12:
-        notes_parts.append("growing puppy portions")
-    if age_months > 84:
-        notes_parts.append("senior dog — reduced calorie needs")
-    if activity == "high":
-        notes_parts.append("active lifestyle — monitor weight monthly")
-    notes = "; ".join(notes_parts) or "Standard adult maintenance formula"
+        return 2.0, "puppy 4-12 months (growth)"
+    if age_months >= 84:  # 7 years+, treated as senior
+        return 1.4, "senior dog (7+ years, lower activity assumed)"
+    if is_neutered:
+        return 1.6, "neutered/spayed adult"
+    return 1.8, "intact adult"
+
+
+def _weight_bracket(weight_kg: float) -> str:
+    """Purely descriptive -- not used in the RER math, just shown to the user."""
+    if weight_kg < 5:
+        return "toy"
+    if weight_kg < 10:
+        return "small"
+    if weight_kg < 25:
+        return "medium"
+    if weight_kg < 45:
+        return "large"
+    return "giant"
+
+
+def _calculate_feeding(weight_kg: float, age_months: int, is_neutered: bool) -> FeedingRecommendation:
+    if weight_kg <= 0:
+        raise HTTPException(status_code=400, detail="Dog weight must be greater than 0 to calculate feeding")
+
+    rer = 70 * (weight_kg ** 0.75)
+    factor, reason = _activity_factor(age_months, is_neutered)
+    kcal_per_day = rer * factor
+
+    # Grams/day depends on the food's kcal density, which varies by brand.
+    # Using a common dry-kibble average (~3.5 kcal/g) as a reasonable default
+    # since no food-specific data exists yet. This should be flagged to the
+    # user as an estimate, not treated as precise for every food brand.
+    ASSUMED_KCAL_PER_GRAM = 3.5
+    grams_per_day = kcal_per_day / ASSUMED_KCAL_PER_GRAM
+
+    meals_per_day = 3 if age_months < 6 else 2
+    grams_per_meal = grams_per_day / meals_per_day
+
+    bracket = _weight_bracket(weight_kg)
+    notes = (
+        f"Estimated for a {bracket}-size dog ({reason}). "
+        f"Assumes ~{ASSUMED_KCAL_PER_GRAM} kcal/g (typical dry kibble) -- "
+        f"check your specific food's label, as kcal density varies by brand."
+    )
 
     return FeedingRecommendation(
         kcal_per_day=round(kcal_per_day, 1),
         grams_per_day=round(grams_per_day, 1),
         meals_per_day=meals_per_day,
-        grams_per_meal=round(grams_per_day / meals_per_day, 1),
-        notes=notes.capitalize(),
+        grams_per_meal=round(grams_per_meal, 1),
+        notes=notes,
     )
 
 
-# ---------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------
+async def _get_owned_dog(dog_id: str, user_id: str, supabase) -> dict:
+    res = (
+        supabase.table("dogs")
+        .select("id, dob, weight_kg, is_neutered")
+        .eq("id", dog_id)
+        .eq("user_id", user_id)
+        .single()
+        .execute()
+    )
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Dog not found")
+    return res.data
+
+
+# ----- Routes -----
 
 @router.get("/feeding-recommendation/{dog_id}", response_model=FeedingRecommendation)
 async def get_feeding_recommendation(
     dog_id: str,
-    activity: str = "moderate",
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
-    # Fetch the dog
-    res = supabase.table("dogs").select("weight_kg, dob").eq("id", dog_id).single().execute()
-    if not res.data:
-        raise HTTPException(status_code=404, detail="Dog not found")
+    dog = await _get_owned_dog(dog_id, user.id, supabase)
 
-    dog = res.data
-    from datetime import date
-    dob = date.fromisoformat(dog["dob"])
-    age_months = (date.today().year - dob.year) * 12 + (date.today().month - dob.month)
+    if dog.get("weight_kg") is None:
+        raise HTTPException(status_code=400, detail="Dog has no weight_kg on file yet")
 
-    return compute_feeding(dog["weight_kg"], age_months, activity)
+    age_months = _age_in_months(dog["dob"])
+    return _calculate_feeding(dog["weight_kg"], age_months, dog.get("is_neutered", False))
 
 
-@router.post("/feeding-logs", status_code=201)
-async def log_meal(
+@router.post("/feeding-logs", status_code=status.HTTP_201_CREATED)
+async def create_feeding_log(
     body: FeedingLogCreate,
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
+    await _get_owned_dog(str(body.dog_id), user.id, supabase)
+
     data = {
         "id": str(uuid.uuid4()),
-        "logged_at": datetime.utcnow().isoformat(),
         **body.model_dump(mode="json"),
     }
     res = supabase.table("feeding_logs").insert(data).execute()
     if not res.data:
-        raise HTTPException(status_code=500, detail="Failed to log meal")
+        raise HTTPException(status_code=500, detail="Failed to save feeding log")
     return res.data[0]
 
 
@@ -117,48 +140,12 @@ async def list_feeding_logs(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
+    await _get_owned_dog(dog_id, user.id, supabase)
     res = (
         supabase.table("feeding_logs")
         .select("*")
         .eq("dog_id", dog_id)
         .order("logged_at", desc=True)
-        .limit(50)
-        .execute()
-    )
-    return res.data or []
-
-
-# ----- Weight logs -----
-
-@router.post("/weight-logs", status_code=201)
-async def log_weight(
-    body: WeightLogCreate,
-    user=Depends(get_current_user),
-    supabase=Depends(get_supabase),
-):
-    data = {
-        "id": str(uuid.uuid4()),
-        "logged_at": (body.logged_at or datetime.utcnow()).isoformat(),
-        "dog_id": str(body.dog_id),
-        "weight_kg": body.weight_kg,
-    }
-    res = supabase.table("weight_logs").insert(data).execute()
-    if not res.data:
-        raise HTTPException(status_code=500, detail="Failed to log weight")
-    return res.data[0]
-
-
-@router.get("/weight-logs/{dog_id}")
-async def list_weight_logs(
-    dog_id: str,
-    user=Depends(get_current_user),
-    supabase=Depends(get_supabase),
-):
-    res = (
-        supabase.table("weight_logs")
-        .select("*")
-        .eq("dog_id", dog_id)
-        .order("logged_at", desc=False)
         .execute()
     )
     return res.data or []
