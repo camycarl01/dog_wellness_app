@@ -66,7 +66,21 @@ app.include_router(symptoms.router, prefix="/api", tags=["symptoms"])
 # Day 11-12: Nutrition + weight
 from routers import nutrition
 app.include_router(nutrition.router, prefix="/api", tags=["nutrition"])
+from routers import mood, activity
+app.include_router(mood.router, prefix="/api", tags=["mood"])
+app.include_router(activity.router, prefix="/api", tags=["activity"])
 
 # Day 15-16: Breed ID
 from routers import predict
 app.include_router(predict.router, prefix="/api/predict", tags=["ml"])
+from routers import heat_cycles
+app.include_router(heat_cycles.router, prefix="/api", tags=["reproductive"])
+
+from routers import training_tips
+app.include_router(training_tips.router, prefix="/api", tags=["training"])
+
+from routers import toxic_foods
+app.include_router(toxic_foods.router, prefix="/api", tags=["safety"])
+
+from routers import reminders
+app.include_router(reminders.router, prefix="/api", tags=["internal"])

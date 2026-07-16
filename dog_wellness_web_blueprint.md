@@ -564,6 +564,9 @@ puppies (
 - [ ] FastAPI: `GET /api/toxic-foods?search=chocolate`
 - [ ] Build: Toxic foods page — search bar + card grid of results with red/amber danger badges
 - [ ] Add "Call vet immediately" button for high-danger foods
+Note on Day 20 — Toxic Food Database (implementation decision):
+The "Call vet immediately" CTA should trigger for danger_level: "high" and "moderate" entries, not just "high". Moderate-danger items (raw bones, corn cobs, high-fat scraps, nuts) can still cause real emergencies — obstruction, choking, pancreatitis — even though their toxicity profile is less severe than something like chocolate or xylitol. Reserving the urgent CTA for "high" only would under-warn users on genuinely dangerous situations that just happen to be mechanical (choking/blockage) rather than chemical (poisoning).
+danger_level: "low" entries (mild GI upset items like dairy, coconut, citrus) should get a softer "monitor your dog" message instead, not the emergency CTA — reserving urgency for low-risk items would dilute the signal and make users less likely to take the high/moderate warnings seriously.
 
 **Day 21 — Week 3 review + email reminders**
 - [ ] Set up SendGrid free account (100 emails/day free)
