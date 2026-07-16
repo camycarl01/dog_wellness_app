@@ -25,6 +25,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 # ----- CORS -----
 # In production, restrict to your Vercel domain
 ALLOWED_ORIGINS = os.getenv(

@@ -1,77 +1,77 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from auth import get_current_user, get_supabase
 from schemas import SymptomLogCreate, Severity
-from datetime import datetime, timedelta
-import random
+from datetime import datetime, date
 import uuid
+
+from ml.illness.predict import predict as predict_illness
+from ml.illness.illness_reference import SYMPTOM_LIST
 
 router = APIRouter()
 
-# ----- Rule-based placeholder "model" (Day 8-9, real ML comes Day 9-10) -----
 
-ILLNESS_PROFILES = [
-    {"illness": "Parvovirus", "symptoms": {"vomiting", "diarrhea", "lethargy", "loss_of_appetite"}, "severity": Severity.emergency,
-     "recommendation": "Highly contagious and dangerous, especially in puppies. See a vet immediately."},
-    {"illness": "Gastroenteritis", "symptoms": {"vomiting", "diarrhea"}, "severity": Severity.moderate,
-     "recommendation": "Monitor hydration closely. See a vet if symptoms persist beyond 24 hours."},
-    {"illness": "Kennel cough", "symptoms": {"coughing", "sneezing", "nasal_discharge"}, "severity": Severity.mild,
-     "recommendation": "Usually mild and self-limiting. Keep away from other dogs and monitor."},
-    {"illness": "Hip dysplasia", "symptoms": {"limping", "lethargy"}, "severity": Severity.moderate,
-     "recommendation": "Schedule a vet visit for a joint evaluation, especially if limping persists."},
-    {"illness": "Ear infection", "symptoms": {"scratching", "swelling"}, "severity": Severity.mild,
-     "recommendation": "Check the ears for odor or discharge. A vet visit can confirm and treat quickly."},
-    {"illness": "Conjunctivitis", "symptoms": {"eye_discharge", "swelling"}, "severity": Severity.mild,
-     "recommendation": "Keep the eye area clean. See a vet if discharge worsens or vision seems affected."},
-    {"illness": "Allergic reaction", "symptoms": {"swelling", "scratching", "eye_discharge"}, "severity": Severity.moderate,
-     "recommendation": "Watch for facial swelling or difficulty breathing — those need emergency care."},
-    {"illness": "Seizure disorder", "symptoms": {"seizure", "lethargy"}, "severity": Severity.emergency,
-     "recommendation": "Any seizure warrants a vet call. Note the duration and what happened before/after."},
-]
-
-FALLBACK = {
-    "illness": "Unable to determine",
-    "severity": Severity.mild,
-    "recommendation": "Not enough matching symptoms to suggest a likely cause. Monitor your dog and check again if symptoms develop.",
-}
+def _age_in_months(dob: str | date) -> int:
+    """
+    Converts a dog's date of birth (string 'YYYY-MM-DD' or date object) into
+    age in whole months, as of today. Used as a direct input feature for the
+    ML model -- NOT a placeholder anymore (see history: a hardcoded age of 48
+    months was masking real predictions, e.g. making puppy-typical illnesses
+    like parvovirus impossible to predict for actual puppies).
+    """
+    if isinstance(dob, str):
+        dob = date.fromisoformat(dob)
+    today = date.today()
+    months = (today.year - dob.year) * 12 + (today.month - dob.month)
+    if today.day < dob.day:
+        months -= 1
+    return max(0, months)
 
 
-def _predict(symptoms: dict, duration_days: int, temperature: float | None):
-    selected = {k for k, v in symptoms.items() if v}
+def _predict(symptoms: dict, age_months: int, duration_days: int, temperature: float | None):
+    """
+    Runs the trained Random Forest illness + severity models.
 
-    if not selected:
-        return FALLBACK["illness"], 0.0, FALLBACK["severity"], FALLBACK["recommendation"]
+    Returns the same 4-tuple shape the old rule-based version returned, so
+    the rest of this file (Supabase insert, response shaping) didn't need to
+    change: (illness, confidence, severity, recommendation)
 
-    scored = []
-    for profile in ILLNESS_PROFILES:
-        overlap = selected & profile["symptoms"]
-        if not overlap:
-            continue
-        score = len(overlap) / len(profile["symptoms"])
-        scored.append((score, profile))
+    `temperature` isn't used by the ML model (it wasn't part of the training
+    features) -- kept as a parameter for API compatibility, but currently
+    has no effect. If a real thermometer reading should influence severity,
+    that needs to be added as a training feature later, distinct from the
+    "fever" checkbox symptom the model already uses.
+    """
+    unknown_keys = set(symptoms.keys()) - set(SYMPTOM_LIST)
+    if unknown_keys:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unknown symptom key(s): {sorted(unknown_keys)}. "
+                   f"Valid symptoms are: {SYMPTOM_LIST}",
+        )
 
-    if not scored:
-        return FALLBACK["illness"], 0.0, FALLBACK["severity"], FALLBACK["recommendation"]
+    result = predict_illness(
+        symptoms=symptoms,
+        age_months=age_months,
+        duration_days=duration_days,
+    )
 
-    scored.sort(key=lambda x: x[0], reverse=True)
-    best_score, best = scored[0]
+    illness = result["illness"]
+    confidence = result["illness_confidence"]
+    severity = Severity(result["severity"])
+    recommendation = result["recommendation"]
 
-    # jitter so repeated identical inputs don't always look robotic
-    confidence = min(0.95, max(0.35, best_score + random.uniform(-0.05, 0.1)))
-
-    severity = best["severity"]
-    # bump severity if symptoms have lasted a while or fever is high
-    if duration_days >= 7 and severity == Severity.mild:
-        severity = Severity.moderate
-    if temperature is not None and temperature >= 39.5 and severity in (Severity.mild, Severity.moderate):
-        severity = Severity.severe
-
-    return best["illness"], round(confidence, 2), severity, best["recommendation"]
+    return illness, confidence, severity, recommendation
 
 
-async def _verify_dog_ownership(dog_id: str, user_id: str, supabase):
+async def _get_owned_dog(dog_id: str, user_id: str, supabase) -> dict:
+    """
+    Verifies the dog belongs to the requesting user AND returns the dog's
+    row data, so callers (like create_symptom_log) can read fields such as
+    dob without a second Supabase round-trip.
+    """
     res = (
         supabase.table("dogs")
-        .select("id")
+        .select("id, dob")
         .eq("id", dog_id)
         .eq("user_id", user_id)
         .single()
@@ -79,6 +79,7 @@ async def _verify_dog_ownership(dog_id: str, user_id: str, supabase):
     )
     if not res.data:
         raise HTTPException(status_code=404, detail="Dog not found")
+    return res.data
 
 
 # ----- Routes -----
@@ -89,10 +90,11 @@ async def create_symptom_log(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
-    await _verify_dog_ownership(str(body.dog_id), user.id, supabase)
+    dog = await _get_owned_dog(str(body.dog_id), user.id, supabase)
+    age_months = _age_in_months(dog["dob"])
 
     illness, confidence, severity, recommendation = _predict(
-        body.symptoms, body.duration_days, body.temperature
+        body.symptoms, age_months, body.duration_days, body.temperature
     )
 
     data = {
@@ -118,7 +120,7 @@ async def list_symptom_logs(
     user=Depends(get_current_user),
     supabase=Depends(get_supabase),
 ):
-    await _verify_dog_ownership(dog_id, user.id, supabase)
+    await _get_owned_dog(dog_id, user.id, supabase)
     res = (
         supabase.table("symptom_logs")
         .select("*")
