@@ -1,0 +1,454 @@
+[
+  {
+    "id": "sit-puppy-beginner",
+    "command": "sit",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Hold a treat at your puppy's nose and slowly raise it up and back over their head. As they lift their nose to follow it, their bottom will naturally lower to the ground.",
+    "steps": [
+      "With your puppy standing, hold a treat right at their nose.",
+      "Slowly lift the treat up and back over their head toward their tail.",
+      "As their head lifts to follow the treat, their rear should drop into a sit.",
+      "The instant their bottom touches the ground, mark it (say 'yes!' or click) and reward.",
+      "Repeat 5-10 times per session, always ending on a success."
+    ]
+  },
+  {
+    "id": "sit-puppy-intermediate",
+    "command": "sit",
+    "age_group": "puppy",
+    "difficulty": "intermediate",
+    "tip": "Once your puppy reliably follows the treat lure into a sit, start fading the treat and using an empty hand with the same motion as your hand signal, adding the verbal cue 'sit' just before the gesture.",
+    "steps": [
+      "Do the same luring motion as before, but with an empty hand.",
+      "As soon as they sit, immediately reward from your other hand.",
+      "Once the hand signal alone works reliably, start saying 'sit' right before you move your hand.",
+      "Gradually reduce the size of the hand signal until a small gesture or the word alone works."
+    ]
+  },
+  {
+    "id": "sit-adult-beginner",
+    "command": "sit",
+    "age_group": "adult",
+    "difficulty": "beginner",
+    "tip": "Adult dogs learn sit the same way as puppies, but AKC guidance notes that lures should be faded faster in adult dogs -- avoid relying on a visible treat for too long.",
+    "steps": [
+      "Use the same lure-and-reward technique as with puppies.",
+      "Fade the treat to an empty-hand signal within the first few sessions.",
+      "Reward generously at first, then shift to rewarding only the best, fastest sits.",
+      "Practice in short, 5-minute sessions to keep your dog engaged."
+    ]
+  },
+  {
+    "id": "stay-puppy-beginner",
+    "command": "stay",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Teach the release word first -- this is the cue that tells your dog the stay is over. Common release words are 'okay', 'free', or 'release'.",
+    "steps": [
+      "Put your puppy in a sit.",
+      "Toss a treat on the floor and say your release word as they step forward to get it.",
+      "Repeat until you can say the release word first, then toss the treat.",
+      "This teaches your puppy that the release word means 'you may move now'."
+    ]
+  },
+  {
+    "id": "stay-puppy-intermediate",
+    "command": "stay",
+    "age_group": "puppy",
+    "difficulty": "intermediate",
+    "tip": "Build duration gradually. Stay is a 'boring' behavior for dogs, so reward the stay itself generously rather than rushing to the release.",
+    "steps": [
+      "With your puppy sitting, hold your palm out like a stop sign and say 'stay'.",
+      "Wait 1-2 seconds, then calmly reward while they're still sitting.",
+      "Gradually increase the wait time in small increments -- a few seconds at a time.",
+      "If they break the stay, calmly reset them without scolding and try a shorter duration next time.",
+      "Aim to build toward a 3-minute stay over multiple sessions."
+    ]
+  },
+  {
+    "id": "stay-adult-advanced",
+    "command": "stay",
+    "age_group": "adult",
+    "difficulty": "advanced",
+    "tip": "Once your dog holds a solid stay, add the three D's: duration, distance, and distraction -- but only increase one at a time.",
+    "steps": [
+      "With your dog in a stay, take one step back, then return and reward.",
+      "Gradually increase distance over many sessions before adding distractions.",
+      "Introduce mild distractions (a dropped toy, a person walking by) only once distance is solid.",
+      "If your dog breaks the stay, you've likely increased difficulty too fast -- go back a step."
+    ]
+  },
+  {
+    "id": "come-puppy-beginner",
+    "command": "come",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Start recall training in a quiet, distraction-free area, ideally indoors. This command could one day save your dog's life, so always make coming to you the best thing that happens all day.",
+    "steps": [
+      "Sit with your puppy nearby in a quiet room.",
+      "Open your arms, say 'come' in an upbeat, excited tone, and encourage them toward you.",
+      "The instant they start moving toward you, praise enthusiastically.",
+      "When they reach you, reward calmly -- don't grab at them, let them come to you.",
+      "Never call your dog to you for something unpleasant (like a bath or nail trim) -- this teaches them recall is risky."
+    ]
+  },
+  {
+    "id": "come-adult-intermediate",
+    "command": "come",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "Practice recall on a long training leash in a slightly more distracting outdoor space before ever trying it off-leash.",
+    "steps": [
+      "Attach a long training leash (15-30 feet) for safety.",
+      "Let your dog wander to the end of the leash, then call 'come' once, cheerfully.",
+      "If they don't respond, gently reel them in rather than repeating the command.",
+      "Reward heavily when they arrive, every single time.",
+      "Only consider off-leash recall practice in a fully enclosed, safe area."
+    ]
+  },
+  {
+    "id": "down-puppy-beginner",
+    "command": "down",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Never push or force your dog's body into a down position -- this can feel intimidating or confusing to them and can damage trust.",
+    "steps": [
+      "Start with your puppy in a sit.",
+      "Hold a treat at their nose, then slowly lower it straight down to the floor.",
+      "As they follow the treat down with their head, their body should lower into a down.",
+      "If their rear pops up instead, slide the treat slightly toward you along the floor.",
+      "Mark and reward the instant their belly touches the ground."
+    ]
+  },
+  {
+    "id": "down-adult-beginner",
+    "command": "down",
+    "age_group": "adult",
+    "difficulty": "beginner",
+    "tip": "Some adult dogs are hesitant to lie down around new people or in new places, since it's a vulnerable position -- be patient and keep early sessions low-pressure.",
+    "steps": [
+      "Practice in a calm, familiar space at first.",
+      "Use the same nose-to-floor lure as with puppies.",
+      "If your dog seems anxious about lying down, sit on the floor with them to make it feel safer.",
+      "Reward generously for any downward movement at first, then require more before rewarding."
+    ]
+  },
+  {
+    "id": "heel-puppy-beginner",
+    "command": "heel",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Heel means walking calmly at your side without pulling. Start indoors with no distractions before ever practicing on a real walk.",
+    "steps": [
+      "Hold a treat at your side, roughly at your puppy's nose height.",
+      "Take a few steps, encouraging your puppy to stay close to your leg to follow the treat.",
+      "Mark and reward every few steps they stay in position.",
+      "Gradually increase the number of steps between rewards."
+    ]
+  },
+  {
+    "id": "heel-adult-intermediate",
+    "command": "heel",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "If your dog pulls on leash, stop moving the instant the leash goes tight, and only continue once there's slack again.",
+    "steps": [
+      "Start walking normally with your dog on leash.",
+      "The moment they pull ahead and the leash tightens, stop walking completely.",
+      "Wait for them to look back at you or create slack in the leash before moving again.",
+      "Reward periodically while they're walking nicely beside you.",
+      "This takes patience -- some dogs need many short walks before this clicks."
+    ]
+  },
+  {
+    "id": "leave-it-puppy-beginner",
+    "command": "leave it",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Leave it teaches your dog to ignore something on cue -- useful for dropped food, dangerous objects, or things you don't want them to grab.",
+    "steps": [
+      "Hold a treat in a closed fist and let your puppy sniff and paw at it.",
+      "Say 'leave it' and wait -- don't pull your hand away, just keep it closed.",
+      "The moment they stop trying to get the treat and back off even slightly, reward them with a DIFFERENT treat from your other hand.",
+      "Repeat until they reliably back off from the closed fist when they hear the cue."
+    ]
+  },
+  {
+    "id": "leave-it-adult-intermediate",
+    "command": "leave it",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "Practice with the item visible on the floor, not just in your hand, since real-world 'leave it' situations usually involve something already on the ground.",
+    "steps": [
+      "Place a low-value treat on the floor and cover it with your foot or hand if needed.",
+      "Say 'leave it' as your dog investigates.",
+      "Reward from your hand (not the item on the floor) when they back off.",
+      "Gradually practice with the item less covered, and with higher-value items, as they improve."
+    ]
+  },
+  {
+    "id": "shake-adult-beginner",
+    "command": "shake",
+    "age_group": "adult",
+    "difficulty": "beginner",
+    "tip": "Shake is a fun trick best taught once sit is solid, since your dog needs to be sitting still to offer a paw.",
+    "steps": [
+      "Ask your dog to sit.",
+      "Gently touch the back of one paw -- most dogs will lift it slightly in response.",
+      "The instant the paw lifts, say 'shake', mark, and reward.",
+      "Repeat until they start lifting the paw on the verbal cue alone, before you touch it.",
+      "Never force or pull the paw -- let them offer it voluntarily."
+    ]
+  },
+  {
+    "id": "shake-puppy-beginner",
+    "command": "shake",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Puppies can learn shake as soon as they have a reliable sit, usually from around 4-5 months old.",
+    "steps": [
+      "Have your puppy sit.",
+      "Hold a treat in a closed fist near the ground -- many puppies will paw at it instinctively.",
+      "The moment a paw lifts or touches your hand, say 'shake', mark, and reward.",
+      "Keep sessions very short (a couple of minutes) since puppies tire of repetition quickly."
+    ]
+  },
+  {
+    "id": "crate-puppy-beginner",
+    "command": "crate training",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "The single most important rule of crate training: the crate must always be a positive place. Never use it as punishment, and never force your dog inside.",
+    "steps": [
+      "Leave the crate door open and let your puppy explore it on their own terms.",
+      "Toss treats near the entrance, then just inside, encouraging them to go in voluntarily.",
+      "Feed meals near or inside the open crate to build a positive association.",
+      "Only close the door once your puppy is entering calmly and confidently on their own.",
+      "Start with the door closed for just a few seconds at a time, rewarding calm behavior, then release."
+    ]
+  },
+  {
+    "id": "crate-puppy-intermediate",
+    "command": "crate training",
+    "age_group": "puppy",
+    "difficulty": "intermediate",
+    "tip": "Build up crate duration slowly and match it to your puppy's actual bladder capacity -- a rough guideline is about one hour per month of age, plus one hour.",
+    "steps": [
+      "Once your puppy is comfortable with the door closed briefly, extend the time in small steps.",
+      "Never leave a puppy in the crate longer than they can reasonably hold their bladder.",
+      "If they whine, check whether it's a genuine need (bathroom, distress) before letting them out -- but don't ignore real distress either.",
+      "Avoid letting them out the instant they whine if it's not a genuine need, as this can accidentally reward whining -- instead wait for a brief pause in the whining before opening the door."
+    ]
+  },
+  {
+    "id": "crate-adult-beginner",
+    "command": "crate training",
+    "age_group": "adult",
+    "difficulty": "beginner",
+    "tip": "Adult dogs can absolutely learn to love a crate, even if they've never had one before -- it just may take a bit more patience than with a puppy.",
+    "steps": [
+      "Introduce the crate the same way as with a puppy: door open, treats and meals inside, no pressure.",
+      "Give it time -- an adult dog with no crate history may take longer to feel safe going in.",
+      "Never rush to closing the door; wait until they're entering calmly and repeatedly on their own.",
+      "If your dog shows signs of real distress (frantic escape attempts, non-stop panting, injury from trying to get out), stop and consult a trainer or veterinary behaviorist rather than pushing through."
+    ]
+  },
+  {
+    "id": "crate-puppy-warning",
+    "command": "crate training",
+    "age_group": "puppy",
+    "difficulty": "advanced",
+    "tip": "Watch for signs that crate training isn't going well: persistent frantic behavior, no improvement after a week or two, or signs of real panic rather than mild fussing. This may mean going back to basics or getting professional help rather than pushing through.",
+    "steps": [
+      "If your puppy panics rather than settles, shorten crate time significantly and rebuild positive associations from scratch.",
+      "Never let a puppy 'cry it out' in the crate -- this can create lasting negative associations rather than solving the issue.",
+      "Consider a covered crate or a more den-like setup if your puppy seems to prefer more enclosed spaces.",
+      "If distress continues despite a slow, positive approach, consult a professional trainer or veterinary behaviorist."
+    ]
+  },
+  {
+    "id": "sit-adult-troubleshooting",
+    "command": "sit",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "If your dog keeps popping back up instead of holding the sit, you may be rewarding too late -- mark the exact moment their bottom touches the ground, not a second after.",
+    "steps": [
+      "Watch closely for the instant contact happens between rear and floor.",
+      "Mark (say 'yes' or click) at that exact moment, even before delivering the treat.",
+      "If they're already standing again by the time you treat, that's fine -- the marker, not the treat timing, tells them what earned the reward.",
+      "If popping up persists, you may be asking for too long a sit too soon -- reward faster at first, then build duration gradually."
+    ]
+  },
+  {
+    "id": "sit-puppy-alternate-capturing",
+    "command": "sit",
+    "age_group": "puppy",
+    "difficulty": "intermediate",
+    "tip": "As an alternative to luring, you can 'capture' a sit by rewarding your puppy any time they naturally choose to sit on their own, without any prompt from you.",
+    "steps": [
+      "Keep treats handy throughout the day, not just in dedicated training sessions.",
+      "Whenever your puppy sits on their own (waiting for food, greeting you, etc.), mark and reward it.",
+      "Over time, they'll start offering sits more often since it's been rewarded.",
+      "Once they're offering sits frequently, start adding the verbal cue 'sit' right as they begin to do it."
+    ]
+  },
+  {
+    "id": "stay-troubleshooting-breaking",
+    "command": "stay",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "If your dog consistently breaks the stay before you release them, you're very likely progressing faster than they're ready for -- go back to a shorter duration or closer distance and rebuild.",
+    "steps": [
+      "Note exactly when the break happens -- after how many seconds, or at what distance.",
+      "Return to a duration/distance just below that point where they reliably succeed.",
+      "Reward more frequently at that easier level before trying to push further again.",
+      "Avoid repeating the stay cue if they break it -- calmly reset them to position without extra commands."
+    ]
+  },
+  {
+    "id": "come-troubleshooting-ignoring",
+    "command": "come",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "If your dog ignores the recall cue outdoors, resist the urge to keep repeating it louder -- this teaches them the cue is optional. Instead, go back to easier distractions and rebuild value for coming to you.",
+    "steps": [
+      "Stop practicing recall in the distracting environment for now.",
+      "Return to a quiet space and make coming to you extremely rewarding (high-value treats, praise, play).",
+      "Reintroduce mild distractions only once recall is very reliable in the easy setting.",
+      "Never call your dog to you and then do something they dislike -- this damages the cue's reliability long-term."
+    ]
+  },
+  {
+    "id": "down-troubleshooting-rear-pops-up",
+    "command": "down",
+    "age_group": "puppy",
+    "difficulty": "intermediate",
+    "tip": "If your puppy's front end goes down but their rear stays up (a 'play bow' position instead of a full down), try sliding the treat along the floor toward you rather than straight down.",
+    "steps": [
+      "From a sit, lower the treat to the floor as usual.",
+      "Once their front paws are down, slowly slide the treat along the ground toward your feet.",
+      "This encourages their whole body, including the rear, to lower and follow.",
+      "Reward the instant their whole body -- belly and rear both -- touches the ground."
+    ]
+  },
+  {
+    "id": "heel-troubleshooting-pulling",
+    "command": "heel",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "The 'stop and wait' method for leash pulling requires real patience -- some dogs take many short walks before it clicks, since every successful pull that gets them somewhere reinforces the behavior.",
+    "steps": [
+      "The moment the leash goes tight from pulling, stop walking immediately -- don't yank back.",
+      "Wait calmly until your dog looks back at you or the leash goes slack on its own.",
+      "Only resume walking once there's slack -- if they pull again immediately, stop again.",
+      "Keep early practice walks short and low-distraction so you're not fighting this battle for an hour straight.",
+      "Consistency across every walk matters -- occasionally letting them pull and get where they want undoes progress."
+    ]
+  },
+  {
+    "id": "leave-it-troubleshooting-high-value",
+    "command": "leave it",
+    "age_group": "adult",
+    "difficulty": "advanced",
+    "tip": "If your dog reliably leaves low-value items but breaks for high-value ones (like food on a counter), you've likely jumped to a harder version too quickly -- rebuild success gradually with a wider range of item values.",
+    "steps": [
+      "Rank items your dog cares about from low interest to high interest.",
+      "Practice 'leave it' starting again from the easiest items, even if they've mastered low-value ones before.",
+      "Only move up in difficulty once they succeed consistently at the current level.",
+      "Always reward with something better than what you asked them to leave."
+    ]
+  },
+  {
+    "id": "shake-troubleshooting-wrong-paw",
+    "command": "shake",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "If your dog offers the wrong paw or paws at you instead of lifting cleanly, only reward the specific motion you want -- dogs will repeat whatever exact behavior got rewarded last time.",
+    "steps": [
+      "Only mark and reward when the correct paw lifts in the way you want.",
+      "If they paw at your hand instead of lifting calmly, wait a moment longer before rewarding, when possible, to encourage a calmer lift.",
+      "Consistency in which paw you ask for matters if you eventually want to teach 'other paw' as a separate cue.",
+      "Keep sessions short -- this is a fun trick, not an essential skill, so there's no rush."
+    ]
+  },
+  {
+    "id": "jumping-puppy-beginner",
+    "command": "jumping (greeting behavior)",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "Jumping happens because it works -- it gets attention, even negative attention like pushing the dog away or scolding. The fix is to make sure jumping never earns attention, while a calmer greeting always does.",
+    "steps": [
+      "The instant your puppy jumps, turn away completely -- no talking, touching, or eye contact.",
+      "Wait for all four paws to be on the ground before turning back and giving attention.",
+      "As soon as paws are down, calmly praise and reward.",
+      "Ask everyone in the household and regular visitors to follow the same rule consistently."
+    ]
+  },
+  {
+    "id": "jumping-adult-intermediate",
+    "command": "jumping (greeting behavior)",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "Teach a specific alternative greeting behavior, like sitting, so your dog has a clear replacement for jumping rather than just being told what not to do.",
+    "steps": [
+      "Practice a solid 'sit' in low-distraction settings first, before using it for greetings specifically.",
+      "Tether your dog's leash to something stable, then have a person approach from a few feet away.",
+      "Ask for a sit; if your dog stands up as the person nears, have them stop or step back.",
+      "Only let the person continue approaching while your dog stays seated.",
+      "Reward the sit generously once the person reaches your dog."
+    ]
+  },
+  {
+    "id": "jumping-adult-management",
+    "command": "jumping (greeting behavior)",
+    "age_group": "adult",
+    "difficulty": "beginner",
+    "tip": "While you're actively training, manage the environment so your dog doesn't get the chance to practice jumping and be accidentally rewarded for it -- management isn't training, but it protects your progress.",
+    "steps": [
+      "Keep your dog on a short leash when guests arrive, so you can prevent the jump physically.",
+      "Use a baby gate or send your dog to a mat/crate before opening the door.",
+      "Brief guests in advance: ask them to ignore your dog completely unless all four paws are on the floor.",
+      "Keep treats near the entryway so you're ready to reward calm behavior immediately."
+    ]
+  },
+  {
+    "id": "crate-adult-troubleshooting",
+    "command": "crate training",
+    "age_group": "adult",
+    "difficulty": "advanced",
+    "tip": "If your adult dog shows real distress in the crate -- frantic escape attempts, injury from trying to get out, non-stop panting or drooling -- this may be genuine crate anxiety, not just normal adjustment, and is worth addressing differently.",
+    "steps": [
+      "Stop crate practice temporarily and consult a veterinarian to rule out any physical discomfort.",
+      "Consider whether your dog does fine when loose in a smaller, safe room instead -- this can help identify whether it's the confinement itself or the crate specifically.",
+      "A veterinary behaviorist or certified trainer can help build a more gradual desensitization plan if anxiety is confirmed.",
+      "Don't force continued crate use while distress is ongoing -- this can deepen the negative association rather than resolve it."
+    ]
+  },
+  {
+    "id": "heel-puppy-troubleshooting",
+    "command": "heel",
+    "age_group": "puppy",
+    "difficulty": "beginner",
+    "tip": "If your puppy loses interest in the treat lure quickly during heel practice, keep sessions very short -- a few minutes at most -- since puppies tire of repetitive walking practice fast.",
+    "steps": [
+      "Practice heel in short bursts of just a few steps at a time.",
+      "End each session on a successful repetition, even if it's brief.",
+      "Mix in play or a favorite toy as a reward occasionally, not just treats.",
+      "Gradually build up distance only as your puppy's attention span allows."
+    ]
+  },
+  {
+    "id": "down-adult-troubleshooting",
+    "command": "down",
+    "age_group": "adult",
+    "difficulty": "intermediate",
+    "tip": "Some adult dogs, especially rescues, may associate lying down with past negative experiences -- if your dog seems fearful rather than just slow to learn, slow down significantly and consider professional guidance.",
+    "steps": [
+      "Watch for signs of fear (cowering, tucked tail, avoidance) versus simple lack of understanding.",
+      "If fear seems present, practice in the calmest, most familiar setting possible, with no pressure to perform.",
+      "Reward any small movement toward lying down, even a slight lowering of the head or shoulders.",
+      "If fearfulness persists, a certified trainer or veterinary behaviorist can help identify the underlying cause."
+    ]
+  }
+]

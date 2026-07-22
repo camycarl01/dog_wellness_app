@@ -1,0 +1,338 @@
+[
+  {
+    "id": "chocolate",
+    "name": "Chocolate (all types)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, diarrhea, panting, excessive thirst and urination, hyperactivity, abnormal heart rhythm, tremors, seizures",
+    "mechanism": "Contains methylxanthines, found in cacao seeds. Darker chocolate and cocoa powder have the highest concentration; white chocolate the lowest.",
+    "action": "Contact your veterinarian or ASPCA Animal Poison Control (888-426-4435) immediately, especially for dark chocolate or large amounts."
+  },
+  {
+    "id": "xylitol",
+    "name": "Xylitol",
+    "danger_level": "high",
+    "symptoms": "Vomiting, lethargy, loss of coordination, progressing to seizures; elevated liver enzymes and liver failure can appear within days",
+    "mechanism": "Found in sugar-free gum, candy, baked goods, toothpaste, and some peanut butter. Causes a rapid insulin release leading to dangerously low blood sugar.",
+    "action": "Seek emergency veterinary care immediately, even for small amounts. Always check ingredient labels on peanut butter and sugar-free products."
+  },
+  {
+    "id": "alcohol",
+    "name": "Alcohol (any alcoholic beverage or food containing alcohol)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, diarrhea, lack of coordination, difficulty breathing, tremors, changes in blood pH, coma",
+    "mechanism": "Rapidly absorbed after ingestion. Under no circumstances should pets be given alcohol.",
+    "action": "Contact your veterinarian or poison control immediately -- prompt action matters since alcohol is absorbed quickly."
+  },
+  {
+    "id": "grapes-raisins",
+    "name": "Grapes and Raisins",
+    "danger_level": "high",
+    "symptoms": "Vomiting, lethargy, decreased appetite, signs of kidney failure (may appear 24-48 hours after ingestion)",
+    "mechanism": "The specific toxic substance is not definitively known, but even small amounts have caused kidney failure in dogs. There is no known safe amount.",
+    "action": "Contact your veterinarian or poison control immediately, even if only a small amount was eaten."
+  },
+  {
+    "id": "macadamia-nuts",
+    "name": "Macadamia Nuts",
+    "danger_level": "moderate",
+    "symptoms": "Weakness, incoordination (especially in the hind legs), depression, vomiting, tremors, elevated body temperature",
+    "mechanism": "The toxic mechanism is not fully understood. Symptoms typically appear within 12 hours and usually resolve within 24-72 hours.",
+    "action": "Contact your veterinarian, particularly if your dog ate a large quantity or symptoms appear."
+  },
+  {
+    "id": "onion",
+    "name": "Onion (raw, cooked, powdered, or dehydrated)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, diarrhea, weakness, pale gums, elevated heart rate (signs of anemia may take days to appear)",
+    "mechanism": "Member of the Allium family. Damages red blood cells, which can lead to anemia. Powdered/dehydrated forms are more concentrated and dangerous.",
+    "action": "Contact your veterinarian, especially with powdered onion or larger amounts -- symptoms of anemia can be delayed."
+  },
+  {
+    "id": "garlic",
+    "name": "Garlic (raw, cooked, or powdered)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, diarrhea, weakness, pale gums, elevated heart rate",
+    "mechanism": "Also a member of the Allium family, similar mechanism to onion. Considered more potent than onion by weight.",
+    "action": "Contact your veterinarian, especially for concentrated forms like garlic powder or large amounts."
+  },
+  {
+    "id": "chives",
+    "name": "Chives",
+    "danger_level": "moderate",
+    "symptoms": "Vomiting, diarrhea, red blood cell damage in larger amounts",
+    "mechanism": "Another Allium species with the same red-blood-cell-damaging mechanism as onion and garlic.",
+    "action": "Contact your veterinarian if a significant amount was eaten."
+  },
+  {
+    "id": "avocado",
+    "name": "Avocado",
+    "danger_level": "low",
+    "symptoms": "Vomiting and diarrhea in dogs (much more severe in birds, rabbits, and livestock)",
+    "mechanism": "Contains persin in the leaves, fruit, seeds, and bark. Dogs are relatively less sensitive than birds or rabbits, but ingestion can still cause GI upset.",
+    "action": "Monitor for vomiting or diarrhea; contact your vet if symptoms are severe or persist."
+  },
+  {
+    "id": "coffee-caffeine",
+    "name": "Coffee, Tea, and Caffeine",
+    "danger_level": "high",
+    "symptoms": "Vomiting, restlessness, rapid breathing, abnormal heart rhythm, tremors, seizures",
+    "mechanism": "Contains methylxanthines, the same toxic compound family as chocolate.",
+    "action": "Contact your veterinarian or poison control immediately, especially for concentrated forms like coffee grounds or espresso."
+  },
+  {
+    "id": "milk-dairy",
+    "name": "Milk and Dairy Products",
+    "danger_level": "low",
+    "symptoms": "Diarrhea, gas, and other digestive upset",
+    "mechanism": "Dogs generally lack sufficient lactase to properly digest lactose in dairy products.",
+    "action": "Not usually an emergency; discontinue feeding and monitor. Contact your vet if symptoms are severe or persistent."
+  },
+  {
+    "id": "yeast-dough",
+    "name": "Raw Yeast Dough",
+    "danger_level": "high",
+    "symptoms": "Bloating, abdominal pain, vomiting, disorientation (from alcohol produced as the yeast ferments)",
+    "mechanism": "Dough continues to rise in the warm, moist stomach, producing gas that can cause the stomach to bloat and potentially twist -- a life-threatening emergency. Yeast also produces alcohol as it ferments.",
+    "action": "Contact your veterinarian or seek emergency care immediately -- this can become a true emergency quickly."
+  },
+  {
+    "id": "raw-meat-eggs",
+    "name": "Raw or Undercooked Meat and Eggs",
+    "danger_level": "moderate",
+    "symptoms": "Vomiting, diarrhea (from bacterial contamination); skin and coat problems with prolonged raw egg feeding",
+    "mechanism": "Can contain Salmonella or E. coli. Raw eggs also contain avidin, an enzyme that can reduce absorption of biotin over time.",
+    "action": "Monitor for GI symptoms; contact your vet if vomiting/diarrhea is severe or persistent."
+  },
+  {
+    "id": "bones-raw",
+    "name": "Raw or Cooked Bones",
+    "danger_level": "moderate",
+    "symptoms": "Choking, vomiting, constipation, or signs of internal injury (straining, pain, lethargy) if a bone splinters",
+    "mechanism": "Bones can cause obstruction or injury to the gastrointestinal tract, potentially requiring surgery.",
+    "action": "If your dog is choking, in pain, or shows signs of a blockage, seek emergency veterinary care immediately."
+  },
+  {
+    "id": "salt",
+    "name": "Salt and Salty Snack Foods",
+    "danger_level": "moderate",
+    "symptoms": "Vomiting, diarrhea, depression, tremors, elevated body temperature, excessive thirst/urination, seizures in severe cases",
+    "mechanism": "Large amounts of sodium can lead to sodium ion poisoning.",
+    "action": "Avoid salty snacks like chips and pretzels; contact your vet if your dog consumed a large quantity or shows symptoms."
+  },
+  {
+    "id": "nuts-general",
+    "name": "Nuts (almonds, pecans, walnuts, and similar)",
+    "danger_level": "low",
+    "symptoms": "Vomiting, diarrhea, and potentially pancreatitis with high-fat exposure",
+    "mechanism": "High oil and fat content can upset digestion and, with large or repeated exposure, contribute to pancreatitis.",
+    "action": "Avoid feeding; contact your vet if your dog shows ongoing vomiting, abdominal pain, or lethargy."
+  },
+  {
+    "id": "coconut",
+    "name": "Coconut and Coconut Products",
+    "danger_level": "low",
+    "symptoms": "Stomach upset, loose stools or diarrhea",
+    "mechanism": "Coconut flesh and milk contain oils that may cause GI upset in larger amounts. Coconut water is high in potassium and should be avoided.",
+    "action": "Small amounts are generally not a serious concern; use caution and monitor for digestive upset."
+  },
+  {
+    "id": "nutmeg",
+    "name": "Nutmeg",
+    "danger_level": "moderate",
+    "symptoms": "Vomiting, dry mouth, agitation, dilated or constricted pupils, rapid heart rate, difficulty walking, hallucinations in large amounts",
+    "mechanism": "Contains myristicin, a compound with strongest effects at high doses or in small dogs.",
+    "action": "Contact your veterinarian if your dog ingests any amount of nutmeg."
+  },
+  {
+    "id": "cinnamon",
+    "name": "Cinnamon",
+    "danger_level": "low",
+    "symptoms": "Mild stomach upset with small amounts; with larger amounts, irritation of the mouth/throat, hyperactivity, elevated heart rate. Inhaled cinnamon powder can cause coughing and breathing difficulty.",
+    "mechanism": "Generally less dangerous than nutmeg, but can irritate the digestive tract and airway.",
+    "action": "Monitor for GI upset; contact your vet if breathing difficulty or significant symptoms occur."
+  },
+  {
+    "id": "wild-mushrooms",
+    "name": "Wild Mushrooms",
+    "danger_level": "high",
+    "symptoms": "Vomiting, diarrhea, drooling, lethargy, jaundice, seizures, or organ failure depending on species ingested",
+    "mechanism": "Many wild mushroom species are toxic and can cause severe liver failure or death; store-bought washed mushrooms are a much lower risk.",
+    "action": "Treat any wild mushroom ingestion as an emergency -- contact your veterinarian or poison control immediately, and bring a photo or sample of the mushroom if possible."
+  },
+  {
+    "id": "fruit-pits",
+    "name": "Fruit Pits and Seeds (cherries, peaches, plums, apricots)",
+    "danger_level": "moderate",
+    "symptoms": "Choking or gastrointestinal obstruction; cyanide poisoning is rare but possible if pits are chewed/crushed in large quantities",
+    "mechanism": "Pits from the Prunus genus contain compounds that release cyanide only if crushed or chewed extensively. The bigger everyday risk is physical obstruction or choking.",
+    "action": "Contact your veterinarian if your dog swallowed a pit whole (choking/obstruction risk) or chewed up a large quantity."
+  },
+  {
+    "id": "human-pain-relievers",
+    "name": "Human Pain Relievers (ibuprofen, acetaminophen, aspirin)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, stomach ulcers, lethargy, difficulty breathing, liver or kidney damage",
+    "mechanism": "These medications are formulated for human metabolism and can be highly toxic to dogs even at doses that seem small.",
+    "action": "Seek emergency veterinary care immediately -- never give human pain medication to a dog without explicit veterinary direction."
+  },
+  {
+    "id": "human-antidepressants",
+    "name": "Human Antidepressants and Cold Medicines",
+    "danger_level": "high",
+    "symptoms": "Tremors, seizures, elevated heart rate, agitation",
+    "mechanism": "Even small doses of many human psychiatric or cold medications can be harmful to dogs.",
+    "action": "Seek emergency veterinary care immediately, and bring the medication packaging if possible."
+  },
+  {
+    "id": "bleach-disinfectants",
+    "name": "Bleach and Disinfectants",
+    "danger_level": "high",
+    "symptoms": "Burns in the mouth and throat, drooling, vomiting, difficulty breathing",
+    "mechanism": "Corrosive chemicals that can damage tissue on contact.",
+    "action": "Seek emergency veterinary care immediately. Do not induce vomiting unless directed by a professional."
+  },
+  {
+    "id": "laundry-dish-detergent",
+    "name": "Laundry and Dishwashing Detergents (especially pods)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, lethargy, difficulty breathing, chemical burns if bitten into",
+    "mechanism": "Concentrated detergent pods are especially dangerous if punctured by a dog's teeth.",
+    "action": "Seek emergency veterinary care immediately."
+  },
+  {
+    "id": "grape-vine-plant",
+    "name": "Grape Vines / Plants",
+    "danger_level": "high",
+    "symptoms": "Same as grapes/raisins: vomiting, lethargy, signs of kidney failure",
+    "mechanism": "The whole plant carries the same risk as the fruit itself.",
+    "action": "Treat as an emergency and contact your veterinarian or poison control immediately, same as for grapes or raisins."
+  },
+  {
+    "id": "protein-bars-drinks",
+    "name": "Protein Bars and Protein Drinks",
+    "danger_level": "moderate",
+    "symptoms": "Varies by ingredient -- often contain xylitol, chocolate, or high sugar/fat content",
+    "mechanism": "A common source of accidental xylitol or chocolate exposure since owners may not realize these products can contain them.",
+    "action": "Check the ingredient label immediately; if xylitol or chocolate is present, contact your veterinarian right away."
+  },
+  {
+    "id": "onion-rings-cooked-alliums",
+    "name": "Cooked Onion Dishes (onion rings, soups, sauces)",
+    "danger_level": "moderate",
+    "symptoms": "Same as raw onion: vomiting, diarrhea, weakness, pale gums",
+    "mechanism": "Cooking does not remove the toxic compounds in onions -- cooked onion is just as dangerous as raw.",
+    "action": "Contact your veterinarian if a meaningful amount was eaten, especially in concentrated dishes like soup or gravy."
+  },
+  {
+    "id": "moldy-food-garbage",
+    "name": "Moldy Food or Garbage",
+    "danger_level": "high",
+    "symptoms": "Tremors, seizures, vomiting, elevated body temperature",
+    "mechanism": "Certain molds produce tremorgenic mycotoxins that can cause severe neurological symptoms.",
+    "action": "Seek emergency veterinary care immediately if your dog has gotten into spoiled food or the garbage and shows tremors or unusual behavior."
+  },
+  {
+    "id": "raw-potato-green-tomato",
+    "name": "Raw/Green Potatoes and Green Tomatoes",
+    "danger_level": "low",
+    "symptoms": "Vomiting, diarrhea, lethargy in large amounts",
+    "mechanism": "Unripe or green parts of the nightshade family contain solanine, which is reduced significantly by cooking and ripening.",
+    "action": "Avoid feeding raw or green parts; contact your vet if a large amount was eaten or symptoms appear."
+  },
+  {
+    "id": "citrus",
+    "name": "Citrus (lemons, limes, grapefruit -- peels, seeds, and pith especially)",
+    "danger_level": "low",
+    "symptoms": "Vomiting, diarrhea, and in large amounts, sensitivity to light",
+    "mechanism": "Citrus fruits contain compounds like psoralens and essential oils, concentrated most in the peel, seeds, and pith.",
+    "action": "Small amounts of citrus flesh are usually not a major concern; contact your vet if peel/seeds were eaten in quantity or symptoms are notable."
+  },
+  {
+    "id": "high-fat-table-scraps",
+    "name": "High-Fat Table Scraps (fatty meat trimmings, bacon grease)",
+    "danger_level": "moderate",
+    "symptoms": "Vomiting, abdominal pain, lethargy -- potential signs of pancreatitis",
+    "mechanism": "High-fat foods can trigger pancreatitis, a painful and potentially serious inflammation of the pancreas.",
+    "action": "Avoid feeding fatty scraps; contact your vet if your dog shows abdominal pain, vomiting, or lethargy after eating fatty food."
+  },
+  {
+    "id": "candy-gum-general",
+    "name": "Candy and Gum (general, unspecified ingredients)",
+    "danger_level": "moderate",
+    "symptoms": "Varies -- may contain chocolate, xylitol, or high sugar content",
+    "mechanism": "A common accidental exposure category; always check for chocolate or xylitol specifically since those are the truly dangerous ingredients.",
+    "action": "Check ingredients for chocolate or xylitol immediately; if either is present, treat as a high-danger exposure and contact your vet."
+  },
+  {
+    "id": "energy-drinks",
+    "name": "Energy Drinks",
+    "danger_level": "high",
+    "symptoms": "Vomiting, restlessness, rapid heart rate, tremors, seizures",
+    "mechanism": "Very high caffeine content, same methylxanthine mechanism as coffee and chocolate, often in concentrated amounts.",
+    "action": "Contact your veterinarian or poison control immediately."
+  },
+  {
+    "id": "raw-bread-yeast-uncooked",
+    "name": "Beer and Fermented Beverages",
+    "danger_level": "high",
+    "symptoms": "Vomiting, disorientation, difficulty breathing, coma in severe cases",
+    "mechanism": "Contains alcohol, absorbed rapidly; same risk profile as other alcoholic beverages.",
+    "action": "Contact your veterinarian or poison control immediately."
+  },
+  {
+    "id": "walnuts-moldy",
+    "name": "Moldy Walnuts (specifically)",
+    "danger_level": "high",
+    "symptoms": "Tremors, seizures, vomiting",
+    "mechanism": "Walnuts that have gone moldy can harbor tremorgenic mycotoxins in addition to the general risks of nuts.",
+    "action": "Seek emergency veterinary care immediately if your dog has eaten moldy nuts of any kind and shows neurological symptoms."
+  },
+  {
+    "id": "essential-oils-food-flavoring",
+    "name": "Concentrated Essential Oils (e.g. used in baking, like peppermint or tea tree oil)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, drooling, weakness, tremors, difficulty breathing",
+    "mechanism": "Highly concentrated oils can be toxic even in small amounts, distinct from the whole herb or spice.",
+    "action": "Contact your veterinarian or poison control immediately if concentrated essential oil was ingested."
+  },
+  {
+    "id": "bread-dough-uncooked-general",
+    "name": "Pizza Dough or Any Uncooked Bread Product",
+    "danger_level": "high",
+    "symptoms": "Bloating, disorientation, vomiting, abdominal pain",
+    "mechanism": "Same risk as raw yeast dough generally -- continues to rise and ferment in the stomach.",
+    "action": "Contact your veterinarian or seek emergency care immediately, especially if your dog appears bloated or distressed."
+  },
+  {
+    "id": "avocado-pit",
+    "name": "Avocado Pit (specifically, as an object)",
+    "danger_level": "moderate",
+    "symptoms": "Choking, vomiting, signs of intestinal blockage (straining, lethargy, loss of appetite)",
+    "mechanism": "Separate from persin toxicity, the pit itself is a significant choking and obstruction hazard due to its size and shape.",
+    "action": "Seek emergency veterinary care if your dog swallowed an avocado pit or shows any signs of blockage."
+  },
+  {
+    "id": "corn-cob",
+    "name": "Corn on the Cob",
+    "danger_level": "moderate",
+    "symptoms": "Vomiting, signs of intestinal blockage (straining, lethargy, loss of appetite, abdominal pain)",
+    "mechanism": "The cob itself is not digestible and is a common cause of intestinal obstruction, often requiring surgery.",
+    "action": "Seek emergency veterinary care if your dog has eaten part or all of a corn cob."
+  },
+  {
+    "id": "sugar-free-gum-general",
+    "name": "Sugar-Free Gum (general)",
+    "danger_level": "high",
+    "symptoms": "Vomiting, lethargy, loss of coordination, seizures",
+    "mechanism": "The vast majority of sugar-free gum contains xylitol -- treat any sugar-free gum ingestion as a xylitol exposure unless confirmed otherwise.",
+    "action": "Contact your veterinarian or poison control immediately, and check the label for xylitol if possible."
+  },
+  {
+    "id": "raw-potato-plant",
+    "name": "Potato Plant (leaves and stems)",
+    "danger_level": "low",
+    "symptoms": "Vomiting, diarrhea, lethargy in large amounts",
+    "mechanism": "Part of the nightshade family; leaves and stems contain more solanine than the tuber itself.",
+    "action": "Prevent access to potato plants in gardens; contact your vet if a large amount was consumed."
+  }
+]
