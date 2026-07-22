@@ -242,3 +242,16 @@ class PuppyCreate(BaseModel):
     buyer_contact: Optional[str] = None
     is_sold: bool = False
     notes: Optional[str] = None
+
+
+class PuppyWeightLogCreate(BaseModel):
+    weight_kg: float
+    logged_at: Optional[datetime] = None
+
+class PuppyWeightLogResponse(PuppyWeightLogCreate):
+    id: UUID
+    puppy_id: UUID
+    logged_at: datetime
+
+    class Config:
+        from_attributes = True

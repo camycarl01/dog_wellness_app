@@ -84,3 +84,7 @@ app.include_router(toxic_foods.router, prefix="/api", tags=["safety"])
 
 from routers import reminders
 app.include_router(reminders.router, prefix="/api", tags=["internal"])
+
+# Day 22: Breeder — litters & puppies
+from routers import litters
+app.include_router(litters.router, prefix="/api", tags=["breeder"])
