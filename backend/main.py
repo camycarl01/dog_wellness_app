@@ -106,10 +106,22 @@ from routers import mood, activity
 app.include_router(mood.router, prefix="/api", tags=["mood"])
 app.include_router(activity.router, prefix="/api", tags=["activity"])
 
+
 # Day 15-16: Breed ID
 from routers import predict
 app.include_router(predict.router, prefix="/api/predict", tags=["ml"])
+from routers import heat_cycles
+app.include_router(heat_cycles.router, prefix="/api", tags=["reproductive"])
 
-# Breed catalog proxy for dropdowns
-from routers import breeds
-app.include_router(breeds.router, prefix="/api", tags=["breeds"])
+from routers import training_tips
+app.include_router(training_tips.router, prefix="/api", tags=["training"])
+
+from routers import toxic_foods
+app.include_router(toxic_foods.router, prefix="/api", tags=["safety"])
+
+from routers import reminders
+app.include_router(reminders.router, prefix="/api", tags=["internal"])
+
+# Day 22: Breeder — litters & puppies
+from routers import litters
+app.include_router(litters.router, prefix="/api", tags=["breeder"])
