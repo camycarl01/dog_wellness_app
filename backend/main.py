@@ -125,3 +125,11 @@ app.include_router(reminders.router, prefix="/api", tags=["internal"])
 # Day 22: Breeder — litters & puppies
 from routers import litters
 app.include_router(litters.router, prefix="/api", tags=["breeder"])
+
+# Weight logs (separate router from nutrition)
+from routers import weight
+app.include_router(weight.router, prefix="/api", tags=["weight"])
+
+# Dashboard aggregate endpoint
+from routers import dashboard
+app.include_router(dashboard.router, prefix="/api", tags=["dashboard"])

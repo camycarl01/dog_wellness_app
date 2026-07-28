@@ -8,7 +8,8 @@ import ThemeToggle from './ThemeToggle'
 import {
   LayoutDashboard, HeartPulse, Utensils, Stethoscope,
   TrendingUp, Dog, Camera, BookOpen, FlaskConical,
-  Users, Settings, LogOut, Menu, X, PawPrint, ChevronDown
+  Users, Settings, LogOut, Menu, X, PawPrint, ChevronDown,
+  Activity, Smile, Heart, AlertTriangle, Dumbbell
 } from 'lucide-react'
 
 const navGroups = [
@@ -23,6 +24,7 @@ const navGroups = [
     label: 'Health',
     items: [
       { to: '/health', icon: HeartPulse, label: 'Symptom checker' },
+      { to: '/health/history', icon: BookOpen, label: 'Symptom history' },
       { to: '/vet', icon: Stethoscope, label: 'Vet visits' },
       { to: '/vet/vaccines', icon: FlaskConical, label: 'Vaccines' },
     ]
@@ -31,21 +33,23 @@ const navGroups = [
     label: 'Nutrition',
     items: [
       { to: '/nutrition', icon: Utensils, label: 'Feeding plan' },
-      { to: '/nutrition/log', icon: BookOpen, label: 'Log a meal' },
+      { to: '/nutrition/toxic-foods', icon: AlertTriangle, label: 'Toxic foods' },
     ]
   },
   {
     label: 'Tracking',
     items: [
       { to: '/tracking/weight', icon: TrendingUp, label: 'Weight & growth' },
-      { to: '/health/history', icon: TrendingUp, label: 'Symptom history' },
+      { to: '/tracking/mood', icon: Smile, label: 'Mood log' },
+      { to: '/tracking/activity', icon: Activity, label: 'Activity log' },
     ]
   },
   {
     label: 'Tools',
     items: [
       { to: '/breed-id', icon: Camera, label: 'Breed identifier' },
-      { to: '/vet', icon: BookOpen, label: 'Vet visits' },
+      { to: '/training', icon: Dumbbell, label: 'Training tips' },
+      { to: '/reproductive', icon: Heart, label: 'Reproductive' },
     ]
   },
 ]
@@ -148,15 +152,13 @@ function AppLayoutInner() {
       <nav className="flex-1 overflow-y-auto">
         {navGroups.map((g) => <NavGroup key={g.label} {...g} />)}
 
-        {isBreeder && (
-          <div className="mb-5">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em] px-3 mb-1.5">Breeder</p>
-            <NavLink to="/breeder" data-cursor="link" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <Users size={16} strokeWidth={1.75} />
-              Litter management
-            </NavLink>
-          </div>
-        )}
+        <div className="mb-5">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em] px-3 mb-1.5">Breeder</p>
+          <NavLink to="/breeder" data-cursor="link" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <Users size={16} strokeWidth={1.75} />
+            Litter management
+          </NavLink>
+        </div>
       </nav>
 
       {/* User footer */}
