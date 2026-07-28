@@ -8,7 +8,6 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
-import ComingSoon from './components/ComingSoon'
 import AddDog from './pages/AddDog'
 import DogProfile from './pages/DogProfile'
 import VetPage from './pages/VetPage'
@@ -24,6 +23,7 @@ import TrainingPage from './pages/TrainingPage'
 import ToxicFoodsPage from './pages/ToxicFoodsPage'
 import ReproductivePage from './pages/ReproductivePage'
 import BreederPage from './pages/BreederPage'
+import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
   return (
@@ -77,8 +77,8 @@ export default function App() {
               <Route path="/breeder" element={<BreederPage />} />
               <Route path="/breeder/litters" element={<BreederPage />} />
 
-              {/* Settings — not yet implemented */}
-              <Route path="/settings" element={<ComingSoon title="Settings" />} />
+              {/* Settings */}
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
 
             {/* Catch all */}
