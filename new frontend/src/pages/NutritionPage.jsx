@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { Utensils, Loader2, Plus, Scale } from 'lucide-react'
+import { Utensils, Loader2, Plus, Scale, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import api from '../lib/api'
 import { useDogs } from '../context/DogContext'
 import PageTransition from '../components/motion/PageTransition'
@@ -23,7 +23,7 @@ export default function NutritionPage() {
   const { activeDog, loading: dogLoading } = useDogs()
   const [recommendation, setRecommendation] = useState(null)
   const [feedingLogs, setFeedingLogs] = useState([])
-  const [weightLogs, setWeightLogs] = useState([])
+  const [weightData, setWeightData] = useState({ logs: [], healthy_range_kg: null, current_status: null, trend: null })
   const [loading, setLoading] = useState(true)
   const [serverError, setServerError] = useState('')
   const [activity, setActivity] = useState('moderate')
@@ -49,7 +49,12 @@ export default function NutritionPage() {
         if (!active) return
         setRecommendation(recRes.data)
         setFeedingLogs(mealsRes.data || [])
-        setWeightLogs(weightRes.data || [])
+        setWeightData({
+          logs: weightRes.data?.logs || [],
+          healthy_range_kg: weightRes.data?.healthy_range_kg || null,
+          current_status: weightRes.data?.current_status || null,
+          trend: weightRes.data?.trend || null,
+        })
       } catch (err) {
         if (active) setServerError(err.response?.data?.detail || 'Could not load nutrition data.')
       } finally {
@@ -80,11 +85,18 @@ export default function NutritionPage() {
   async function onWeightSubmit(values) {
     setServerError('')
     try {
-      const { data } = await api.post('/api/weight-logs', {
+      await api.post('/api/weight-logs', {
         dog_id: activeDog.id,
         weight_kg: Number(values.weight_kg),
       })
-      setWeightLogs((prev) => [data, ...prev])
+      // Re-fetch the full weight response so we get updated status + trend
+      const weightRes = await api.get(`/api/weight-logs/${activeDog.id}`)
+      setWeightData({
+        logs: weightRes.data?.logs || [],
+        healthy_range_kg: weightRes.data?.healthy_range_kg || null,
+        current_status: weightRes.data?.current_status || null,
+        trend: weightRes.data?.trend || null,
+      })
       weightForm.reset()
     } catch (err) {
       setServerError(err.response?.data?.detail || err.message || 'Could not save weight log.')
@@ -203,6 +215,36 @@ export default function NutritionPage() {
 
           <section className="rounded-2xl border border-border bg-card p-6">
             <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground"><Scale size={18} /> Weight logs</h2>
+
+            {/* Status banner */}
+            {!loading && weightData.current_status && (
+              <div className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-secondary/40 px-4 py-3">
+                <div className="flex-1">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Current status</p>
+                  <p className={`mt-0.5 text-sm font-semibold capitalize ${
+                    weightData.current_status === 'healthy' ? 'text-green-500' :
+                    weightData.current_status === 'underweight' ? 'text-yellow-500' : 'text-orange-500'
+                  }`}>{weightData.current_status.replace('_', ' ')}</p>
+                </div>
+                {weightData.trend && (
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    {weightData.trend === 'up' ? <TrendingUp size={16} className="text-orange-400" /> :
+                     weightData.trend === 'down' ? <TrendingDown size={16} className="text-blue-400" /> :
+                     <Minus size={16} />}
+                    <span className="text-xs capitalize">{weightData.trend}</span>
+                  </div>
+                )}
+                {weightData.healthy_range_kg && (
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Healthy range</p>
+                    <p className="mt-0.5 text-xs font-medium text-foreground">
+                      {weightData.healthy_range_kg.min}–{weightData.healthy_range_kg.max} kg
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             <form onSubmit={weightForm.handleSubmit(onWeightSubmit)} className="mb-5 space-y-4 rounded-xl border border-border bg-secondary/30 p-4">
               <div>
                 <label className={labelClass}>Weight (kg)</label>
@@ -214,11 +256,11 @@ export default function NutritionPage() {
             </form>
             {loading ? (
               <div className="text-sm text-muted-foreground">Loading weights…</div>
-            ) : weightLogs.length === 0 ? (
+            ) : weightData.logs.length === 0 ? (
               <div className="text-sm text-muted-foreground">No weight logs yet.</div>
             ) : (
               <div className="space-y-3">
-                {weightLogs.map((log) => (
+                {[...weightData.logs].reverse().map((log) => (
                   <div key={log.id} className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
                     <p className="text-sm text-foreground/80">{fmtDate(log.logged_at)}</p>
                     <p className="text-sm font-medium text-foreground">{log.weight_kg} kg</p>

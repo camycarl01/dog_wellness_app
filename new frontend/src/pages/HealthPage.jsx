@@ -22,12 +22,19 @@ const SYMPTOMS = [
   { key: 'loss_of_appetite', label: 'Loss of appetite' },
   { key: 'coughing', label: 'Coughing' },
   { key: 'sneezing', label: 'Sneezing' },
+  { key: 'nasal_discharge', label: 'Nasal discharge' },
   { key: 'limping', label: 'Limping' },
   { key: 'scratching', label: 'Scratching' },
+  { key: 'ear_discharge', label: 'Ear discharge' },
   { key: 'eye_discharge', label: 'Eye discharge' },
-  { key: 'nasal_discharge', label: 'Nasal discharge' },
   { key: 'swelling', label: 'Swelling' },
   { key: 'seizure', label: 'Seizure' },
+  { key: 'fever', label: 'Fever' },
+  { key: 'excessive_thirst', label: 'Excessive thirst' },
+  { key: 'weight_loss', label: 'Weight loss' },
+  { key: 'weight_gain', label: 'Weight gain' },
+  { key: 'bad_breath', label: 'Bad breath' },
+  { key: 'skin_redness', label: 'Skin redness' },
 ]
 
 export default function HealthPage() {
