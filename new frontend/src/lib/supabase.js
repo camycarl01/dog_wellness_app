@@ -101,6 +101,15 @@ export const signUp = async (email, password, name, isBreeder = false) => {
     }
   })
   if (error) throw error
+
+  // Supabase can return a user object without identities when the email is
+  // already registered. Treat that as a duplicate account instead of a fresh signup.
+  if (data?.user?.identities?.length === 0) {
+    const duplicateError = new Error('An account with this email already exists. Please sign in instead.')
+    duplicateError.code = 'user_already_exists'
+    throw duplicateError
+  }
+
   return data
 }
 
@@ -115,6 +124,14 @@ export const getAuthErrorMessage = (error, fallback = 'Something went wrong. Try
     error?.status === 429
   ) {
     return 'Too many signup emails were requested. Please wait a few minutes before trying again.'
+  }
+
+  if (
+    message.includes('email not confirmed') ||
+    message.includes('user not confirmed') ||
+    message.includes('signup not confirmed')
+  ) {
+    return 'Please check your email and confirm your account before signing in.'
   }
 
   return rawMessage || fallback

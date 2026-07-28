@@ -17,6 +17,8 @@ import HealthPage from './pages/HealthPage'
 import HealthResultPage from './pages/HealthResultPage'
 import HealthHistoryPage from './pages/HealthHistoryPage'
 
+import NutritionPage from './pages/NutritionPage'
+import BreedIdPage from './pages/BreedIdPage'
 
 function PlaceholderPage({ title, day }) {
   return <ComingSoon title={title} day={day} />
@@ -52,8 +54,8 @@ export default function App() {
             <Route path="/health/history" element={<HealthHistoryPage />} />
 
             {/* Nutrition */}
-            <Route path="/nutrition" element={<PlaceholderPage title="Feeding plan" day={11} />} />
-            <Route path="/nutrition/log" element={<PlaceholderPage title="Log a meal" day={11} />} />
+            <Route path="/nutrition" element={<NutritionPage />} />
+            <Route path="/nutrition/log" element={<NutritionPage />} />
             <Route path="/nutrition/toxic-foods" element={<PlaceholderPage title="Toxic foods database" day={20} />} />
 
             {/* Vet */}
@@ -61,12 +63,12 @@ export default function App() {
             <Route path="/vet/vaccines" element={<VaccinesPage />} />
 
             {/* Tracking */}
-            <Route path="/tracking/weight" element={<PlaceholderPage title="Weight & growth chart" day={12} />} />
+            <Route path="/tracking/weight" element={<NutritionPage />} />
             <Route path="/tracking/mood" element={<PlaceholderPage title="Mood log" day={13} />} />
             <Route path="/tracking/activity" element={<PlaceholderPage title="Activity log" day={13} />} />
 
             {/* Tools */}
-            <Route path="/breed-id" element={<PlaceholderPage title="Breed identifier (AI)" day={16} />} />
+            <Route path="/breed-id" element={<BreedIdPage />} />
             <Route path="/training" element={<PlaceholderPage title="Training tips" day={19} />} />
             <Route path="/reproductive" element={<PlaceholderPage title="Reproductive cycle tracker" day={18} />} />
 

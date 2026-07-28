@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PawPrint, Pencil, ArrowLeft, Cake, Scale, Dog, Check, X, Loader2 } from 'lucide-react'
 import api from '../lib/api'
 import { dogSchema } from '../lib/dogSchema'
+import BreedSelect from '../components/BreedSelect'
 import { Reveal, StaggerReveal } from '../components/motion/Reveal'
 import Magnetic from '../components/motion/Magnetic'
 import PageTransition from '../components/motion/PageTransition'
@@ -192,10 +193,19 @@ export default function DogProfile() {
                 <input id="name" className={inputClass} {...register('name')} />
                 {fieldError('name')}
               </div>
-              <div>
-                <label htmlFor="breed" className={labelClass}>Breed</label>
-                <input id="breed" className={inputClass} {...register('breed')} />
-                {fieldError('breed')}
+              <div className="relative z-50">
+                <Controller
+                  name="breed"
+                  control={control}
+                  render={({ field }) => (
+                    <BreedSelect
+                      label="Breed"
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.breed?.message}
+                    />
+                  )}
+                />
               </div>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>

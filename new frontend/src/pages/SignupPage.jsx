@@ -56,7 +56,11 @@ export default function SignupPage() {
     }
     setLoading(true)
     try {
-      await signUp(values.email, values.password, values.name, values.isBreeder)
+      const result = await signUp(values.email, values.password, values.name, values.isBreeder)
+      if (result?.session) {
+        navigate('/dashboard')
+        return
+      }
       setSuccess(true)
     } catch (err) {
       setAuthError(getAuthErrorMessage(err))

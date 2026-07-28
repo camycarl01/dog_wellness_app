@@ -31,21 +31,21 @@ const navGroups = [
     label: 'Nutrition',
     items: [
       { to: '/nutrition', icon: Utensils, label: 'Feeding plan' },
-      { to: '/nutrition/toxic-foods', icon: BookOpen, label: 'Toxic foods' },
+      { to: '/nutrition/log', icon: BookOpen, label: 'Log a meal' },
     ]
   },
   {
     label: 'Tracking',
     items: [
       { to: '/tracking/weight', icon: TrendingUp, label: 'Weight & growth' },
-      { to: '/tracking/activity', icon: TrendingUp, label: 'Activity log' },
+      { to: '/health/history', icon: TrendingUp, label: 'Symptom history' },
     ]
   },
   {
     label: 'Tools',
     items: [
       { to: '/breed-id', icon: Camera, label: 'Breed identifier' },
-      { to: '/training', icon: BookOpen, label: 'Training tips' },
+      { to: '/vet', icon: BookOpen, label: 'Vet visits' },
     ]
   },
 ]

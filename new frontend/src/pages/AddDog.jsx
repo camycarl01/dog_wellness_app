@@ -7,6 +7,7 @@ import api from '../lib/api'
 import { supabase } from '../lib/supabase'
 import { uploadDogPhoto } from '../lib/uploadDogPhoto'
 import { dogSchema } from '../lib/dogSchema'
+import BreedSelect from '../components/BreedSelect'
 import { Reveal, StaggerReveal } from '../components/motion/Reveal'
 import Magnetic from '../components/motion/Magnetic'
 import PageTransition from '../components/motion/PageTransition'
@@ -118,10 +119,19 @@ export default function AddDog() {
                 <input id="name" className={inputClass} placeholder="e.g. Bingo" {...register('name')} />
                 {fieldError('name')}
               </div>
-              <div>
-                <label htmlFor="breed" className={labelClass}>Breed</label>
-                <input id="breed" className={inputClass} placeholder="e.g. Boerboel" {...register('breed')} />
-                {fieldError('breed')}
+              <div className="relative z-50">
+                <Controller
+                  name="breed"
+                  control={control}
+                  render={({ field }) => (
+                    <BreedSelect
+                      label="Breed"
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.breed?.message}
+                    />
+                  )}
+                />
               </div>
             </div>
 

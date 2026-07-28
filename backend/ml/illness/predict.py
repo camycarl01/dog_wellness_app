@@ -16,22 +16,18 @@ This is the function Day 10's FastAPI endpoint (POST /api/predict/illness)
 should call directly.
 """
 
-from pathlib import Path
-
 import joblib
 import pandas as pd
-from .illness_reference import (
+from illness_reference import (
     SYMPTOM_LIST,
     ILLNESS_TO_SEVERITY,
     SEVERITY_RANK,
     ILLNESS_CONFIDENCE_THRESHOLD,
 )
 
-_MODEL_DIR = Path(__file__).resolve().parent
-
-_illness_model = joblib.load(_MODEL_DIR / "illness_model.pkl")
-_severity_model = joblib.load(_MODEL_DIR / "severity_model.pkl")
-_feature_cols = joblib.load(_MODEL_DIR / "feature_columns.pkl")
+_illness_model = joblib.load("illness_model.pkl")
+_severity_model = joblib.load("severity_model.pkl")
+_feature_cols = joblib.load("feature_columns.pkl")
 
 
 def predict(symptoms: dict, age_months: int, duration_days: int) -> dict:
@@ -51,44 +47,91 @@ def predict(symptoms: dict, age_months: int, duration_days: int) -> dict:
           "recommendation": str,
         }
     """
-    row = {s: int(bool(symptoms.get(s, 0))) for s in SYMPTOM_LIST}
-    row["age_months"] = age_months
-    row["duration_days"] = duration_days
-    X = pd.DataFrame([row])[_feature_cols]
+    assets = _load_ml_assets()
+    if assets is not None:
+        row = {s: int(bool(symptoms.get(s, 0))) for s in SYMPTOM_LIST}
+        row["age_months"] = age_months
+        row["duration_days"] = duration_days
+        X = assets["pd"].DataFrame([row])[assets["feature_cols"]]
 
-    illness_proba = _illness_model.predict_proba(X)[0]
-    illness_classes = _illness_model.classes_
-    top_idx = illness_proba.argmax()
-    top_illness = illness_classes[top_idx]
-    top_confidence = float(illness_proba[top_idx])
+        illness_proba = assets["illness_model"].predict_proba(X)[0]
+        illness_classes = assets["illness_model"].classes_
+        top_idx = illness_proba.argmax()
+        top_illness = illness_classes[top_idx]
+        top_confidence = float(illness_proba[top_idx])
 
-    severity_model_output = _severity_model.predict(X)[0]
+        severity_model_output = assets["severity_model"].predict(X)[0]
 
-    if top_confidence < ILLNESS_CONFIDENCE_THRESHOLD:
-        illness_result = "inconclusive"
-        # With no confident illness match, trust the severity model directly.
-        final_severity = severity_model_output
-        disagreement = False
-    else:
-        illness_implied_severity = ILLNESS_TO_SEVERITY.get(top_illness, severity_model_output)
-        disagreement = illness_implied_severity != severity_model_output
-        # Default to whichever is more urgent -- safer to over-warn than under-warn.
-        final_severity = max(
-            illness_implied_severity,
-            severity_model_output,
-            key=lambda s: SEVERITY_RANK[s],
-        )
-        illness_result = top_illness
+        if top_confidence < 0.40:
+            illness_result = "inconclusive"
+            final_severity = severity_model_output
+            disagreement = False
+        else:
+            illness_implied_severity = ILLNESS_TO_SEVERITY.get(top_illness, severity_model_output)
+            disagreement = illness_implied_severity != severity_model_output
+            final_severity = max(
+                illness_implied_severity,
+                severity_model_output,
+                key=lambda s: SEVERITY_RANK[s],
+            )
+            illness_result = top_illness
 
-    recommendation = _recommendation_for(final_severity)
+        recommendation = _recommendation_for(final_severity)
+
+        return {
+            "illness": illness_result,
+            "illness_confidence": round(top_confidence, 2),
+            "severity": final_severity,
+            "severity_model_output": severity_model_output,
+            "severity_disagreement": disagreement,
+            "recommendation": recommendation,
+        }
+
+    return _predict_fallback(symptoms, age_months, duration_days)
+
+
+def _predict_fallback(symptoms: dict, age_months: int, duration_days: int) -> dict:
+    active_symptoms = {name for name, value in symptoms.items() if value}
+
+    best_row = None
+    best_score = -1.0
+
+    for row in ILLNESS_TABLE:
+        overlap = len(active_symptoms.intersection(row["symptoms"]))
+        age_low, age_high = row["age_months_range"]
+        duration_low, duration_high = row["duration_days_range"]
+
+        score = float(overlap * 2)
+        if age_low <= age_months <= age_high:
+            score += 1.0
+        if duration_low <= duration_days <= duration_high:
+            score += 1.0
+
+        if score > best_score:
+            best_score = score
+            best_row = row
+
+    if best_row is None or best_score <= 0:
+        return {
+            "illness": "inconclusive",
+            "illness_confidence": 0.0,
+            "severity": "mild",
+            "severity_model_output": "mild",
+            "severity_disagreement": False,
+            "recommendation": _recommendation_for("mild"),
+        }
+
+    confidence = min(1.0, round(best_score / 8.0, 2))
+    illness = best_row["illness"] if confidence >= 0.4 else "inconclusive"
+    severity = best_row["severity"]
 
     return {
-        "illness": illness_result,
-        "illness_confidence": round(top_confidence, 2),
-        "severity": final_severity,
-        "severity_model_output": severity_model_output,
-        "severity_disagreement": disagreement,
-        "recommendation": recommendation,
+        "illness": illness,
+        "illness_confidence": confidence,
+        "severity": severity,
+        "severity_model_output": severity,
+        "severity_disagreement": False,
+        "recommendation": _recommendation_for(severity),
     }
 
 

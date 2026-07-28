@@ -5,6 +5,7 @@ FastAPI backend with Supabase auth + PostgreSQL
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from pathlib import Path
 import os
 from dotenv import load_dotenv
 
@@ -12,6 +13,16 @@ load_dotenv()
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+# Reuse the frontend Supabase env during local development when the backend
+# does not have its own .env file yet.
+_project_root = Path(__file__).resolve().parent.parent
+for candidate in [
+    _project_root / "new frontend" / ".env",
+    _project_root / "frontend" / ".env",
+]:
+    if candidate.exists():
+        load_dotenv(candidate, override=False)
 
 # ----- App factory -----
 
@@ -98,18 +109,7 @@ app.include_router(activity.router, prefix="/api", tags=["activity"])
 # Day 15-16: Breed ID
 from routers import predict
 app.include_router(predict.router, prefix="/api/predict", tags=["ml"])
-from routers import heat_cycles
-app.include_router(heat_cycles.router, prefix="/api", tags=["reproductive"])
 
-from routers import training_tips
-app.include_router(training_tips.router, prefix="/api", tags=["training"])
-
-from routers import toxic_foods
-app.include_router(toxic_foods.router, prefix="/api", tags=["safety"])
-
-from routers import reminders
-app.include_router(reminders.router, prefix="/api", tags=["internal"])
-
-# Day 22: Breeder — litters & puppies
-from routers import litters
-app.include_router(litters.router, prefix="/api", tags=["breeder"])
+# Breed catalog proxy for dropdowns
+from routers import breeds
+app.include_router(breeds.router, prefix="/api", tags=["breeds"])

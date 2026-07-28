@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { isSupabaseConfigured, signIn } from '../lib/supabase'
+import { getAuthErrorMessage, isSupabaseConfigured, signIn } from '../lib/supabase'
 import { Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react'
 import AuthShell from '../components/AuthShell'
 import Magnetic from '../components/motion/Magnetic'
@@ -31,7 +31,7 @@ export default function LoginPage() {
       await signIn(values.email, values.password)
       navigate('/dashboard')
     } catch (err) {
-      setAuthError(err.message || 'Invalid email or password')
+      setAuthError(getAuthErrorMessage(err, 'Invalid email or password'))
     } finally {
       setLoading(false)
     }
