@@ -12,6 +12,7 @@ Usage:
     python train_model.py
 """
 
+import os
 import pandas as pd
 import joblib
 from sklearn.model_selection import train_test_split
@@ -23,8 +24,13 @@ FEATURE_COLS = SYMPTOM_LIST + ["age_months", "duration_days"]
 
 
 def load_data(path="dog_illness_dataset.csv"):
-    return pd.read_csv(path)
-
+    # Get the directory where train_model.py lives
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Create the full absolute path to the CSV
+    absolute_path = os.path.join(current_dir, path)
+    
+    return pd.read_csv(absolute_path)
 
 def train_illness_model(df):
     X = df[FEATURE_COLS]
