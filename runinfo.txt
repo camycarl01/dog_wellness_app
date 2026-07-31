@@ -1,2 +1,3 @@
 uvicorn main:app --reload in Backend
+.\venv\Scripts\activate
 npm run dev in frontend

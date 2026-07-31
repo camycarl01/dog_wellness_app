@@ -18,22 +18,16 @@ should call directly.
 
 import joblib
 import pandas as pd
-from illness_reference import (
+from .illness_reference import (
     SYMPTOM_LIST,
     ILLNESS_TO_SEVERITY,
     SEVERITY_RANK,
     ILLNESS_CONFIDENCE_THRESHOLD,
 )
 
-try:
-    _illness_model = joblib.load("illness_model.pkl")
-    _severity_model = joblib.load("severity_model.pkl")
-    _feature_cols = joblib.load("feature_columns.pkl")
-except Exception:
-    # .pkl files not present yet — fall back to rule-based predictor at runtime
-    _illness_model = None
-    _severity_model = None
-    _feature_cols = None
+_illness_model = joblib.load("ml/illness/illness_model.pkl")
+_severity_model = joblib.load("ml/illness/severity_model.pkl")
+_feature_cols = joblib.load("ml/illness/feature_columns.pkl")
 
 
 def predict(symptoms: dict, age_months: int, duration_days: int) -> dict:

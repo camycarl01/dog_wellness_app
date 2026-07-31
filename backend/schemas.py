@@ -89,9 +89,17 @@ class IllnessPrediction(BaseModel):
     severity: Severity
     recommendation: str
 
-
+class PuppyUpdate(BaseModel):
+    name: Optional[str] = None
+    gender: Optional[str] = None
+    color: Optional[str] = None
+    status: Optional[str] = None
 # ----- Vet visits -----
 
+class PuppySoldUpdate(BaseModel):
+    is_sold: Optional[bool] = True
+    sold_to: Optional[str] = None
+    sold_price: Optional[float] = None
 class VetVisitCreate(BaseModel):
     dog_id: UUID
     visit_date: date
