@@ -30,7 +30,8 @@ _severity_model = joblib.load("ml/illness/severity_model.pkl")
 _feature_cols = joblib.load("ml/illness/feature_columns.pkl")
 
 
-def predict(symptoms: dict, age_months: int, duration_days: int) -> dict:
+def predict(symptoms: dict, age_months: int, duration_days: int,
+            temperature: float | None = None) -> dict:
     """
     symptoms: dict mapping symptom name -> bool/0/1, e.g. {"vomiting": True, ...}
               Any symptom in SYMPTOM_LIST not present in this dict is treated as 0.
@@ -89,25 +90,75 @@ def predict(symptoms: dict, age_months: int, duration_days: int) -> dict:
             "recommendation": recommendation,
         }
 
-    return _predict_fallback(symptoms, age_months, duration_days)
+    return _predict_fallback(symptoms, age_months, duration_days, temperature)
 
 
-def _predict_fallback(symptoms: dict, age_months: int, duration_days: int) -> dict:
+def _predict_fallback(symptoms: dict, age_months: int, duration_days: int,
+                      temperature: float | None = None) -> dict:
+    """
+    Improved rule-based fallback used when trained .pkl models are absent.
+
+    Scoring uses a weighted Jaccard coefficient rather than raw overlap counts,
+    so a disease with many symptoms is not unfairly penalised when only a few
+    are present. Primary symptoms receive 2× weight — their presence (or
+    absence) discriminates far more than secondary signs.
+
+    Steps:
+      1. Weighted symptom similarity (Jaccard-style, with primary boosting)
+      2. +0.10 bonus if age is in documented range
+      3. +0.10 bonus if duration is in documented range
+      4. Temperature adjustment: ≥39.5°C → inject "fever" into active set and
+         push emergency/severe illnesses up; ≤37.5°C → remove "fever" if only
+         subjectively checked
+      5. Top candidate must have similarity > 0 to be considered
+    """
     active_symptoms = {name for name, value in symptoms.items() if value}
+
+    # --- Temperature-informed symptom injection ---
+    if temperature is not None:
+        if temperature >= 39.5:
+            active_symptoms.add("fever")
+        elif temperature <= 37.5:
+            active_symptoms.discard("fever")
 
     best_row = None
     best_score = -1.0
 
     for row in ILLNESS_TABLE:
-        overlap = len(active_symptoms.intersection(row["symptoms"]))
-        age_low, age_high = row["age_months_range"]
-        duration_low, duration_high = row["duration_days_range"]
+        all_syms = set(row["symptoms"])
+        primary_syms = set(row.get("primary_symptoms", row["symptoms"][:2]))
+        secondary_syms = all_syms - primary_syms
 
-        score = float(overlap * 2)
+        # Weighted intersection: primary hits count 2, secondary count 1
+        primary_hits = active_symptoms.intersection(primary_syms)
+        secondary_hits = active_symptoms.intersection(secondary_syms)
+        weighted_intersection = len(primary_hits) * 2 + len(secondary_hits)
+
+        # Weighted union: same weights applied to avoid penalising large sets
+        weighted_union = len(primary_syms) * 2 + len(secondary_syms) + len(
+            active_symptoms - all_syms
+        )
+
+        if weighted_union == 0:
+            continue
+
+        jaccard = weighted_intersection / weighted_union
+
+        # Context bonuses (each worth 10% on top of similarity)
+        age_low, age_high = row["age_months_range"]
+        dur_low, dur_high = row["duration_days_range"]
+        bonus = 0.0
         if age_low <= age_months <= age_high:
-            score += 1.0
-        if duration_low <= duration_days <= duration_high:
-            score += 1.0
+            bonus += 0.10
+        if dur_low <= duration_days <= dur_high:
+            bonus += 0.10
+
+        # If user entered a real temperature, give a small boost to illnesses
+        # where fever is a primary symptom (more discriminating signal)
+        if temperature is not None and temperature >= 39.5 and "fever" in primary_syms:
+            bonus += 0.08
+
+        score = jaccard + bonus
 
         if score > best_score:
             best_score = score
@@ -123,9 +174,15 @@ def _predict_fallback(symptoms: dict, age_months: int, duration_days: int) -> di
             "recommendation": _recommendation_for("mild"),
         }
 
-    confidence = min(1.0, round(best_score / 8.0, 2))
-    illness = best_row["illness"] if confidence >= 0.4 else "inconclusive"
+    # Clamp confidence to [0, 1] — the bonuses can push beyond 1.0
+    confidence = round(min(1.0, best_score), 2)
+    illness = best_row["illness"] if confidence >= ILLNESS_CONFIDENCE_THRESHOLD else "inconclusive"
     severity = best_row["severity"]
+
+    # If the user entered a critically high temperature, escalate severity
+    # even if the matched illness is normally mild
+    if temperature is not None and temperature >= 40.5:
+        severity = max(severity, "severe", key=lambda s: SEVERITY_RANK[s])
 
     return {
         "illness": illness,
