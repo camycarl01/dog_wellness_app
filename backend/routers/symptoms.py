@@ -53,6 +53,7 @@ def _predict(symptoms: dict, age_months: int, duration_days: int, temperature: f
         symptoms=symptoms,
         age_months=age_months,
         duration_days=duration_days,
+        temperature=temperature,
     )
 
     illness = result["illness"]

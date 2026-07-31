@@ -34,7 +34,8 @@ export default function HealthResultPage() {
   const style = SEVERITY_STYLES[result.severity] || SEVERITY_STYLES.mild
   const Icon = style.icon
   const isUrgent = result.severity === 'severe' || result.severity === 'emergency'
-  const confidencePct = Math.round((result.confidence || 0) * 100)
+  // API returns illness_confidence; fall back to confidence for older logs
+  const confidencePct = Math.round(((result.illness_confidence ?? result.confidence) || 0) * 100)
 
   return (
     <PageTransition>
