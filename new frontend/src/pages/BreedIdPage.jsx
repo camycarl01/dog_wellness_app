@@ -71,15 +71,32 @@ export default function BreedIdPage() {
 
         {result?.predictions?.length ? (
           <div className="mt-6 rounded-2xl border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold text-foreground">Top matches</h2>
-            <div className="space-y-3">
-              {result.predictions.map((item) => (
-                <div key={item.breed} className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
-                  <span className="text-sm font-medium text-foreground">{item.breed}</span>
-                  <span className="text-sm text-muted-foreground">{Math.round(item.confidence * 100)}%</span>
-                </div>
-              ))}
+            <h2 className="mb-5 text-lg font-semibold text-foreground">Top matches</h2>
+            <div className="space-y-4">
+              {result.predictions.map((item, i) => {
+                const pct = Math.round(item.confidence * 100)
+                return (
+                  <div key={item.breed}>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {i === 0 && <span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">Best match</span>}
+                        <span className="text-sm font-medium text-foreground">{item.breed}</span>
+                      </div>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{pct}%</span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all duration-700"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
             </div>
+            <p className="mt-5 text-xs text-muted-foreground">
+              Results are AI-generated and should be confirmed by a veterinarian or breed expert.
+            </p>
           </div>
         ) : null}
       </div>
