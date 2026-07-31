@@ -74,7 +74,7 @@ function ErrorBanner({ message }) {
 // ---------------------------------------------------------------------------
 // Profile section — update display name
 // ---------------------------------------------------------------------------
-function ProfileSection({ displayName }) {
+function ProfileSection({ displayName, refreshUser }) {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm({
@@ -83,13 +83,13 @@ function ProfileSection({ displayName }) {
 
   async function onSave({ name }) {
     setSuccess(''); setError('')
-    if (!isSupabaseConfigured) {
-      setError('Supabase is not configured — profile updates are unavailable in demo mode.')
-      return
-    }
     try {
-      const { error: sbError } = await supabase.auth.updateUser({ data: { name } })
-      if (sbError) throw sbError
+      if (isSupabaseConfigured) {
+        const { error: sbError } = await supabase.auth.updateUser({ data: { name } })
+        if (sbError) throw sbError
+      }
+      // Sync the AuthContext so the sidebar / header shows the new name immediately
+      await refreshUser({ name })
       setSuccess('Display name updated.')
     } catch (err) {
       setError(err.message || 'Could not update profile.')
@@ -133,11 +133,13 @@ function PasswordSection() {
 
   async function onSave({ newPassword }) {
     setSuccess(''); setError('')
-    if (!isSupabaseConfigured) {
-      setError('Supabase is not configured — password changes are unavailable in demo mode.')
-      return
-    }
     try {
+      if (!isSupabaseConfigured) {
+        // Demo mode — password change is a no-op but we confirm it visually
+        setSuccess('Password updated successfully.')
+        reset()
+        return
+      }
       const { error: sbError } = await supabase.auth.updateUser({ password: newPassword })
       if (sbError) throw sbError
       setSuccess('Password updated successfully.')
@@ -217,7 +219,7 @@ function PasswordSection() {
 // ---------------------------------------------------------------------------
 // Account type section — breeder toggle
 // ---------------------------------------------------------------------------
-function AccountTypeSection({ isBreeder: initialIsBreeder }) {
+function AccountTypeSection({ isBreeder: initialIsBreeder, refreshUser }) {
   const [isBreeder, setIsBreeder] = useState(initialIsBreeder)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
@@ -226,17 +228,16 @@ function AccountTypeSection({ isBreeder: initialIsBreeder }) {
   async function handleToggle(val) {
     setIsBreeder(val)
     setSuccess(''); setError('')
-    if (!isSupabaseConfigured) {
-      setError('Supabase is not configured — account type changes are unavailable in demo mode.')
-      return
-    }
     setSaving(true)
     try {
-      const { error: sbError } = await supabase.auth.updateUser({ data: { is_breeder: val } })
-      if (sbError) throw sbError
+      if (isSupabaseConfigured) {
+        const { error: sbError } = await supabase.auth.updateUser({ data: { is_breeder: val } })
+        if (sbError) throw sbError
+      }
+      await refreshUser({ is_breeder: val })
       setSuccess(val ? 'Breeder features enabled.' : 'Breeder features disabled.')
     } catch (err) {
-      setIsBreeder(!val) // revert
+      setIsBreeder(!val) // revert optimistic update
       setError(err.message || 'Could not update account type.')
     } finally {
       setSaving(false)
@@ -311,7 +312,7 @@ function AppearanceSection() {
 // Page root
 // ---------------------------------------------------------------------------
 export default function SettingsPage() {
-  const { displayName, isBreeder } = useAuth()
+  const { displayName, isBreeder, refreshUser } = useAuth()
 
   return (
     <PageTransition>
@@ -327,9 +328,9 @@ export default function SettingsPage() {
         </Reveal>
 
         <StaggerReveal className="mt-8 flex flex-col gap-4">
-          <ProfileSection displayName={displayName} />
+          <ProfileSection displayName={displayName} refreshUser={refreshUser} />
           <PasswordSection />
-          <AccountTypeSection isBreeder={isBreeder} />
+          <AccountTypeSection isBreeder={isBreeder} refreshUser={refreshUser} />
           <AppearanceSection />
         </StaggerReveal>
       </div>

@@ -51,10 +51,22 @@ const TEMP_ADMIN = { email: 'admin@pawcare.app', password: 'admin123' }
 const DEMO_SESSION_KEY = 'pawcare_demo_admin'
 export const DEMO_AUTH_EVENT = 'pawcare:demo-auth'
 
+const DEMO_META_KEY = 'pawcare_demo_meta'
+const _defaultDemoMeta = { name: 'Admin (Temp)', is_breeder: true }
+
+function _getDemoMeta() {
+  try {
+    const raw = sessionStorage.getItem(DEMO_META_KEY)
+    return raw ? JSON.parse(raw) : { ..._defaultDemoMeta }
+  } catch {
+    return { ..._defaultDemoMeta }
+  }
+}
+
 export const demoAdminUser = {
   id: 'demo-admin',
   email: TEMP_ADMIN.email,
-  user_metadata: { name: 'Admin (Temp)', is_breeder: true },
+  get user_metadata() { return _getDemoMeta() },
 }
 
 export const getDemoUser = () => {
@@ -63,6 +75,16 @@ export const getDemoUser = () => {
   } catch {
     return null
   }
+}
+
+/**
+ * Merges `patch` into the demo user's persisted metadata and returns a plain
+ * snapshot of the updated user — used by AuthContext.refreshUser() after a save.
+ */
+export const updateDemoUserMetadata = (patch) => {
+  const next = { ..._getDemoMeta(), ...patch }
+  try { sessionStorage.setItem(DEMO_META_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  return { id: 'demo-admin', email: TEMP_ADMIN.email, user_metadata: next }
 }
 
 const startDemoSession = () => {
