@@ -17,6 +17,10 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from auth import get_current_user
 from schemas import BreedPredictionResponse, BreedPrediction
 import httpx
+from dotenv import load_dotenv
+
+# Load variables from the .env file into the environment
+load_dotenv()
 
 router = APIRouter()
 
@@ -114,8 +118,7 @@ async def predict_breed(
     if content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type '{content_type}'. "
-                   f"Allowed: JPEG, PNG, WebP.",
+            detail=f"Unsupported file type '{content_type}'. Allowed: JPEG, PNG, WebP.",
         )
 
     contents = await file.read()
@@ -123,8 +126,7 @@ async def predict_breed(
     if len(contents) > MAX_UPLOAD_SIZE_BYTES:
         raise HTTPException(
             status_code=400,
-            detail=f"File too large ({len(contents) / 1024 / 1024:.1f} MB). "
-                   f"Maximum is 8 MB.",
+            detail=f"File too large ({len(contents) / 1024 / 1024:.1f} MB). Maximum is 8 MB.",
         )
 
     try:
