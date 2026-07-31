@@ -190,9 +190,11 @@ export default function BreedSelect({
     window.addEventListener('resize', onLayoutChange)
     window.addEventListener('scroll', onLayoutChange, true)
     updateMenuStyle()
-    return () => document.removeEventListener('pointerdown', onPointerDown)
-    window.removeEventListener('resize', onLayoutChange)
-    window.removeEventListener('scroll', onLayoutChange, true)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('resize', onLayoutChange)
+      window.removeEventListener('scroll', onLayoutChange, true)
+    }
   }, [open])
 
   useEffect(() => {
