@@ -9,14 +9,19 @@ const inputClass =
   'transition-colors placeholder:text-muted-foreground ' +
   'focus:outline-none focus:border-primary focus:ring-2 focus:ring-ring/25'
 
+// JSON uses danger_level: "high" | "moderate" | "low"
 const SEVERITY_CONFIG = {
-  severe: { label: 'Severe', cls: 'bg-red-500/10 text-red-400 border-red-500/20' },
-  moderate: { label: 'Moderate', cls: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
-  mild: { label: 'Mild', cls: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
+  high:     { label: 'High danger',     cls: 'bg-red-500/10 text-red-400 border-red-500/20' },
+  moderate: { label: 'Moderate danger', cls: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
+  low:      { label: 'Low danger',      cls: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
 }
 
 function FoodCard({ food }) {
-  const severity = SEVERITY_CONFIG[food.toxicity_level?.toLowerCase()] || SEVERITY_CONFIG.moderate
+  const severity = SEVERITY_CONFIG[food.danger_level?.toLowerCase()] || SEVERITY_CONFIG.moderate
+  // symptoms in the JSON is a comma-separated string — split it into an array
+  const symptomList = food.symptoms
+    ? (Array.isArray(food.symptoms) ? food.symptoms : food.symptoms.split(',').map((s) => s.trim()).filter(Boolean))
+    : []
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-destructive/30">
@@ -31,14 +36,15 @@ function FoodCard({ food }) {
               {severity.label}
             </span>
           </div>
-          {food.reason && (
-            <p className="text-sm text-muted-foreground leading-relaxed">{food.reason}</p>
+          {/* JSON key is "mechanism", not "reason" */}
+          {food.mechanism && (
+            <p className="text-sm text-muted-foreground leading-relaxed">{food.mechanism}</p>
           )}
-          {food.symptoms && food.symptoms.length > 0 && (
+          {symptomList.length > 0 && (
             <div className="mt-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-1.5">Symptoms</p>
               <div className="flex flex-wrap gap-1.5">
-                {food.symptoms.map((s) => (
+                {symptomList.map((s) => (
                   <span
                     key={s}
                     className="inline-flex rounded-full border border-border bg-secondary px-2.5 py-0.5 text-xs text-foreground/70"
@@ -49,10 +55,11 @@ function FoodCard({ food }) {
               </div>
             </div>
           )}
-          {food.what_to_do && (
+          {/* JSON key is "action", not "what_to_do" */}
+          {food.action && (
             <div className="mt-3 rounded-lg border border-border bg-secondary/50 px-3.5 py-2.5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-1">If ingested</p>
-              <p className="text-sm text-foreground/80">{food.what_to_do}</p>
+              <p className="text-sm text-foreground/80">{food.action}</p>
             </div>
           )}
         </div>
