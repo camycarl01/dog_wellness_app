@@ -1,76 +1,104 @@
 """
-ML prediction router.
-Day 15-16: Breed ID with MobileNetV2 CNN
-Day 17: Feeding recommendation with XGBoost
+Breed identification router.
 
-Falls back to a placeholder response if the trained model files aren't
-present yet, so the route exists and the frontend can be wired up
-independently of ML training being finished.
+Uses GPT-4o-mini vision via the Vercel AI Gateway for accurate breed
+detection across hundreds of breeds. The model receives the uploaded image
+as a base64 data URI and returns a structured JSON list of top breed
+matches with confidence scores.
+
+The AI_GATEWAY_API_KEY environment variable must be set (it is set
+automatically when the Vercel AI Gateway integration is connected).
 """
+import os
+import base64
+import json
+import re
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from auth import get_current_user
 from schemas import BreedPredictionResponse, BreedPrediction
-import os
+import httpx
 
 router = APIRouter()
 
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
-MAX_UPLOAD_SIZE_BYTES = 8 * 1024 * 1024  # 8MB
-IMG_SIZE = (224, 224)
+MAX_UPLOAD_SIZE_BYTES = 8 * 1024 * 1024  # 8 MB
 
-# Try to load the breed model if it exists (added on Day 15).
-# Files live in backend/ml/breed/ -- breed_model.h5 (Keras model) and
-# class_indices.json (dict of {breed_name: class_index}, saved directly
-# from the training notebook's train_generator.class_indices).
-_breed_model = None
-_index_to_breed = {}
-_preprocess_input = None  # loaded alongside tensorflow, kept as a module ref
+_AI_GATEWAY_BASE = "https://ai-gateway.vercel.sh/v1"
+_MODEL = "openai/gpt-4o-mini"
 
-
-def _try_load_breed_model():
-    global _breed_model, _index_to_breed, _preprocess_input
-    try:
-        import tensorflow as tf
-        from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
-        import json
-
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-        model_path = os.path.join(this_dir, "..", "ml", "breed", "breed_model.h5")
-        indices_path = os.path.join(this_dir, "..", "ml", "breed", "class_indices.json")
-
-        if os.path.exists(model_path) and os.path.exists(indices_path):
-            _breed_model = tf.keras.models.load_model(model_path)
-            with open(indices_path) as f:
-                class_indices = json.load(f)  # {"beagle": 0, "chihuahua": 1, ...}
-            _index_to_breed = {v: k for k, v in class_indices.items()}
-            _preprocess_input = preprocess_input
-            print("✅ Breed model loaded")
-        else:
-            print(f"⚠️  Breed model files not found at {model_path} -- using placeholder responses")
-    except Exception as e:
-        print(f"⚠️  Breed model not loaded: {e}")
+_SYSTEM_PROMPT = (
+    "You are an expert canine breed identification system. "
+    "When given a photo of a dog, identify the top 3 most likely breeds "
+    "and assign a confidence score (0.0–1.0) to each. "
+    "If the image clearly shows a mixed-breed dog, list the most prominent "
+    "component breeds (e.g. 'Labrador Mix', 'Border Collie Mix'). "
+    "If the image does not show a dog at all, return an empty list.\n\n"
+    "IMPORTANT: Respond ONLY with a valid JSON array, no markdown, no explanation. "
+    "Format: [{\"breed\": \"Breed Name\", \"confidence\": 0.85}, ...]"
+)
 
 
-_try_load_breed_model()
-
-
-def _prepare_image(image_bytes: bytes):
+async def _call_vision_api(image_bytes: bytes, content_type: str) -> list[dict]:
     """
-    Preprocesses uploaded image bytes to exactly match training
-    preprocessing: resize to 224x224, then MobileNetV2's preprocess_input
-    (which scales to [-1, 1] using channel-wise mean subtraction -- NOT a
-    plain /255.0 normalization, which would silently produce wrong
-    predictions since it doesn't match what the model was trained on).
+    Sends the image to GPT-4o-mini via the AI Gateway and parses the
+    structured breed predictions from the response.
     """
-    import numpy as np
-    from PIL import Image
-    import io
+    api_key = os.getenv("AI_GATEWAY_API_KEY", "")
+    if not api_key or "sentinel" in api_key:
+        raise ValueError("AI_GATEWAY_API_KEY is not configured.")
 
-    img = Image.open(io.BytesIO(image_bytes)).convert("RGB").resize(IMG_SIZE)
-    arr = np.array(img, dtype=np.float32)
-    arr = np.expand_dims(arr, axis=0)
-    arr = _preprocess_input(arr)
-    return arr
+    # Encode the image as a base64 data URI
+    b64 = base64.b64encode(image_bytes).decode("utf-8")
+    data_uri = f"data:{content_type};base64,{b64}"
+
+    payload = {
+        "model": _MODEL,
+        "max_tokens": 256,
+        "messages": [
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": data_uri, "detail": "low"},
+                    },
+                    {
+                        "type": "text",
+                        "text": "Identify the dog breed(s) in this photo.",
+                    },
+                ],
+            },
+        ],
+    }
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        resp = await client.post(
+            f"{_AI_GATEWAY_BASE}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+        )
+        resp.raise_for_status()
+
+    raw = resp.json()["choices"][0]["message"]["content"].strip()
+
+    # Strip markdown code fences if the model returns them despite instructions
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$", "", raw)
+
+    predictions = json.loads(raw)
+
+    # Validate and clamp each entry
+    result = []
+    for item in predictions[:3]:
+        breed = str(item.get("breed", "Unknown")).strip()
+        confidence = max(0.0, min(1.0, float(item.get("confidence", 0.5))))
+        result.append({"breed": breed, "confidence": round(confidence, 4)})
+
+    return result
 
 
 @router.post("/breed", response_model=BreedPredictionResponse)
@@ -78,11 +106,16 @@ async def predict_breed(
     file: UploadFile = File(...),
     user=Depends(get_current_user),
 ):
-    if file.content_type not in ALLOWED_CONTENT_TYPES:
+    # Normalise content type: some browsers send "image/jpg"
+    content_type = file.content_type or ""
+    if content_type == "image/jpg":
+        content_type = "image/jpeg"
+
+    if content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type '{file.content_type}'. "
-                   f"Allowed: {sorted(ALLOWED_CONTENT_TYPES)}",
+            detail=f"Unsupported file type '{content_type}'. "
+                   f"Allowed: JPEG, PNG, WebP.",
         )
 
     contents = await file.read()
@@ -90,37 +123,40 @@ async def predict_breed(
     if len(contents) > MAX_UPLOAD_SIZE_BYTES:
         raise HTTPException(
             status_code=400,
-            detail=f"File too large ({len(contents) / 1024 / 1024:.1f}MB). "
-                   f"Max size is {MAX_UPLOAD_SIZE_BYTES / 1024 / 1024:.0f}MB.",
+            detail=f"File too large ({len(contents) / 1024 / 1024:.1f} MB). "
+                   f"Maximum is 8 MB.",
         )
 
-    if _breed_model is None:
-        # Placeholder until the model files are in place
-        return BreedPredictionResponse(
-            predictions=[
-                BreedPrediction(breed="Labrador Retriever", confidence=0.72),
-                BreedPrediction(breed="Golden Retriever", confidence=0.18),
-                BreedPrediction(breed="Flat-Coated Retriever", confidence=0.10),
-            ]
-        )
-
-    # Real prediction path
     try:
-        arr = _prepare_image(contents)
-        preds = _breed_model.predict(arr, verbose=0)[0]
-        top3_idx = preds.argsort()[-3:][::-1]
-        return BreedPredictionResponse(
-            predictions=[
-                BreedPrediction(
-                    breed=_index_to_breed[i].replace("_", " ").title(),
-                    confidence=round(float(preds[i]), 4),
-                )
-                for i in top3_idx
-            ]
+        predictions = await _call_vision_api(contents, content_type)
+    except ValueError as e:
+        # API key not configured
+        raise HTTPException(status_code=503, detail=str(e))
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Vision API error: {e.response.status_code}",
         )
-    except HTTPException:
-        raise
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not parse breed prediction response: {str(e)}",
+        )
     except Exception as e:
-        # Covers corrupt/unreadable image data that passed the content-type
-        # check but fails to actually decode (renamed file, truncated upload).
-        raise HTTPException(status_code=400, detail=f"Could not process this image: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Breed identification failed: {str(e)}",
+        )
+
+    if not predictions:
+        raise HTTPException(
+            status_code=422,
+            detail="No dog detected in the image. Please upload a clear photo of a dog.",
+        )
+
+    return BreedPredictionResponse(
+        predictions=[
+            BreedPrediction(breed=p["breed"], confidence=p["confidence"])
+            for p in predictions
+        ]
+    )
