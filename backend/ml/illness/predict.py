@@ -47,22 +47,24 @@ def predict(symptoms: dict, age_months: int, duration_days: int) -> dict:
           "recommendation": str,
         }
     """
-    assets = _load_ml_assets()
-    if assets is not None:
+    # Use the module-level models loaded at import time.
+    # If they failed to load (e.g. missing .pkl files), fall back to the
+    # rule-based predictor so the endpoint still returns a useful response.
+    if _illness_model is not None and _severity_model is not None and _feature_cols is not None:
         row = {s: int(bool(symptoms.get(s, 0))) for s in SYMPTOM_LIST}
         row["age_months"] = age_months
         row["duration_days"] = duration_days
-        X = assets["pd"].DataFrame([row])[assets["feature_cols"]]
+        X = pd.DataFrame([row])[_feature_cols]
 
-        illness_proba = assets["illness_model"].predict_proba(X)[0]
-        illness_classes = assets["illness_model"].classes_
+        illness_proba = _illness_model.predict_proba(X)[0]
+        illness_classes = _illness_model.classes_
         top_idx = illness_proba.argmax()
         top_illness = illness_classes[top_idx]
         top_confidence = float(illness_proba[top_idx])
 
-        severity_model_output = assets["severity_model"].predict(X)[0]
+        severity_model_output = _severity_model.predict(X)[0]
 
-        if top_confidence < 0.40:
+        if top_confidence < ILLNESS_CONFIDENCE_THRESHOLD:
             illness_result = "inconclusive"
             final_severity = severity_model_output
             disagreement = False

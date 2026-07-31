@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase, getDemoUser, DEMO_AUTH_EVENT } from '../lib/supabase'
+import { supabase, getDemoUser, DEMO_AUTH_EVENT, updateDemoUserMetadata } from '../lib/supabase'
 
 const AuthContext = createContext(null)
 
@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
     }
     window.addEventListener(DEMO_AUTH_EVENT, onDemoAuth)
 
-    // Listen for auth state changes
+    // Listen for auth state changes (real Supabase users)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (getDemoUser()) return
       setSession(session)
@@ -52,10 +52,36 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  /**
+   * Call this after a successful supabase.auth.updateUser() so that the UI
+   * immediately reflects the new name / metadata without waiting for the next
+   * onAuthStateChange event (which is delayed or skipped for demo sessions).
+   */
+  async function refreshUser(updatedMetadata) {
+    const demoUser = getDemoUser()
+    if (demoUser) {
+      // For the demo session, merge the new metadata into the in-memory object
+      // AND persist it to sessionStorage so it survives a refresh.
+      const merged = updateDemoUserMetadata(updatedMetadata)
+      setUser({ ...merged })
+      setSession({ user: { ...merged } })
+      return
+    }
+    // For real Supabase sessions, re-fetch the latest user object
+    try {
+      const { data: { user: fresh } } = await supabase.auth.getUser()
+      if (fresh) {
+        setUser(fresh)
+        setSession((prev) => prev ? { ...prev, user: fresh } : prev)
+      }
+    } catch { /* silent — stale state is acceptable here */ }
+  }
+
   const value = {
     user,
     session,
     loading,
+    refreshUser,
     isBreeder: user?.user_metadata?.is_breeder ?? false,
     displayName: user?.user_metadata?.name ?? user?.email ?? '',
   }

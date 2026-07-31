@@ -107,7 +107,11 @@ app.include_router(mood.router, prefix="/api", tags=["mood"])
 app.include_router(activity.router, prefix="/api", tags=["activity"])
 
 
-# Day 15-16: Breed ID
+# Breeds catalog (Dog CEO API proxy)
+from routers import breeds
+app.include_router(breeds.router, prefix="/api", tags=["breeds"])
+
+# Day 15-16: Breed ID / ML prediction
 from routers import predict
 app.include_router(predict.router, prefix="/api/predict", tags=["ml"])
 from routers import heat_cycles
